@@ -325,9 +325,11 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		}
 		if orderInfo.Status != enum.OrderStatusUnPaid {
 			return nil, errors.New("订单状态错误")
+		} else {
+			payOrderId = orderInfo.OrderNumber
 		}
 	}
-	payOrderId = util.GetRandInt64()
+	//payOrderId = util.GetRandInt64()
 
 	wxPayClient, err := fee.GetWechatPayClient(c, &WxPayConfig{
 		MchId:           wxPayConfig.MchId,

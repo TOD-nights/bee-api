@@ -112,7 +112,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(info beeReq.BeePa
 		db = db.Limit(limit).Offset(offset).Select("bee_pay_log.*, b.name as shopName").Debug()
 	}
 
-	err = db.Find(&beePayLogs).Error
+	err = db.Scan(&beePayLogs).Error
 	return beePayLogs, total, err
 }
 
