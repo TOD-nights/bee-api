@@ -4,5 +4,5 @@ import "github.com/flipped-aurora/gin-vue-admin/server/model/bee"
 
 type BeePayLogInfoDto struct {
 	bee.BeePayLog
-	ShopName string `json:"shopName" gorm:"column:shopName"`
+	ShopName string `json:"shopName" gorm:"column:shopName;"`
 }

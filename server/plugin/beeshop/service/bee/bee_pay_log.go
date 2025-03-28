@@ -2,6 +2,7 @@ package bee
 
 import (
 	"fmt"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/dto"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee"
@@ -63,7 +64,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(info beeReq.BeePa
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := GetBeeDB().Model(&dto.BeePayLogInfoDto{}).Joins(" left join bee_order a on a.order_number = bee_pay_log.order_no left join bee_shop_info b on b.id = a.shop_id")
+	db := global.GVA_DB.Model(&dto.BeePayLogInfoDto{}).Joins(" left join bee_order a on a.order_number = bee_pay_log.order_no left join bee_shop_info b on b.id = a.shop_id")
 	db = db.Where("bee_pay_log.user_id = ?", shopUserId)
 	var beePayLogs []dto.BeePayLogInfoDto
 	// 如果有条件搜索 下方会自动创建搜索语句
