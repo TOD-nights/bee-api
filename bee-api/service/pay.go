@@ -305,6 +305,7 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 	var payType = enum.PayNextActionTypeRecharge
 	var nextActionJson payAction
 	var payOrderId string
+	var outTradeNo string
 	var err error
 	if err = db.GetDB().Where("user_id = ? and is_deleted = 0", kit.GetUserId(c)).Take(&wxPayConfig).Error; err != nil {
 		return nil, errors.Wrap(err, "获取微信配置失败！")
@@ -326,10 +327,10 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		if orderInfo.Status != enum.OrderStatusUnPaid {
 			return nil, errors.New("订单状态错误")
 		} else {
-			payOrderId = orderInfo.OrderNumber
+			outTradeNo = orderInfo.OrderNumber
 		}
 	}
-	//payOrderId = util.GetRandInt64()
+	payOrderId = util.GetRandInt64()
 
 	wxPayClient, err := fee.GetWechatPayClient(c, &WxPayConfig{
 		MchId:           wxPayConfig.MchId,
@@ -370,14 +371,15 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		return nil, errors.New("微信请求失败：" + wxResp.Error)
 	}
 	beePayLog := &model.BeePayLog{
-		BaseModel:  *kit.GetInsertBaseModel(c),
-		Money:      money,
-		NextAction: nextAction,
-		OrderNo:    payOrderId,
-		PayGate:    enum.PayGateWXAPP,
-		Remark:     "",
-		Status:     enum.PayLogStatusUnPaid,
-		Uid:        kit.GetUid(c),
+		BaseModel:   *kit.GetInsertBaseModel(c),
+		Money:       money,
+		NextAction:  nextAction,
+		OrderNo:     payOrderId,
+		PayGate:     enum.PayGateWXAPP,
+		Remark:      "",
+		Status:      enum.PayLogStatusUnPaid,
+		Uid:         kit.GetUid(c),
+		OrderNumber: outTradeNo,
 	}
 	err = db.GetDB().Create(beePayLog).Error
 	if err != nil {
