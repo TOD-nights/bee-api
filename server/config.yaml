@@ -33,7 +33,7 @@ aws-s3:
 bee-shop:
     disable: false
     listen: ""
-    host: ""
+    host: "http://9kuai8coffee.asia:8087/"
 captcha:
     key-long: 4
     img-width: 240
@@ -216,7 +216,7 @@ tencent-cos:
     base-url: https://gin.vue.admin
     path-prefix: github.com/flipped-aurora/gin-vue-admin/server
 zap:
-    level: info
+    level: debug
     prefix: '[github.com/flipped-aurora/gin-vue-admin/server]'
     format: console
     director: log

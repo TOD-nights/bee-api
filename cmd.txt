@@ -1,11 +1,19 @@
 
 更新并重启后端服务：
 
-cd /root/bee-api && git pull
 cd /root/bee-api/bee-api && go build -o beeapi main.go
 这个命令会编译 main.go 文件，并生成一个名为 beeapi 的可执行文件。适合构建发布版本，你可以将这个生成的二进制文件部署到服务器上运行。
+
+go run main.go
+这个命令会编译并立即运行 main.go 文件。适合快速测试和调试代码，因为它不会生成一个可执行文件，而是直接运行代码。
+
 kill -9 `ps -ef | grep beeapi | grep -v grep | awk '{print $2}'` && nohup ./beeapi > beeapi.log 2>&1 &
+
+去看日志： 
 tail +F beeapi.log
+tail -f /root/bee-api/bee-api/nohup.out
+tail -f /root/bee-api/server/nohup.out
+
 
 # 检查端口是否正常监听
 netstat -tulpn | grep beeapi
@@ -13,9 +21,9 @@ netstat -lanp | grep :8081
 # 停止当前服务
 pkill -f beeapi
 
-go run main.go
-这个命令会编译并立即运行 main.go 文件。适合快速测试和调试代码，因为它不会生成一个可执行文件，而是直接运行代码。
 
+
+-----
 
 
 cd /root/bee-api/server && go build -o server main.go
@@ -23,13 +31,50 @@ kill -9 `ps -ef | grep server | grep -v grep | awk '{print $2}'` && nohup ./serv
 less +F server.log
 tail +F server.log
 
- 
-# 停止当前服务
+
 netstat -tulpn | grep server
+netstat -lanp | grep :18083
+
+ 127.0.0.1:18083         0.0.0.0:*               LISTEN      13213/./server
+:::8888                                   LISTEN      13213/./server
+
 pkill -f server
 
 
+--------
 
+
+下载更新并重新构建前端：
+
+cd /root/bee-api/web
+
+
+# 或者使用阿里云镜像
+npm config set registry https://registry.npm.taobao.org
+
+npm install
+
+npm run build  # 生产环境
+# 特点：
+- 生成静态文件，通常在 dist 目录下
+- 代码会被压缩混淆，体积更小
+- 移除调试信息
+- 需要 web 服务器（如 nginx）来托管
+- 针对性能做了优化
+
+把打包出来的dist文件夹去替换/var/www/bee文件 
+
+# 复制构建文件到 nginx 目录
+# 注意：可能需要 sudo 权限
+sudo cp -r dist/* /var/www/bee/
+
+echo "部署完成！"
+
+nginx -s reload
+
+--------
+
+cd /root/bee-api && git pull
 
 服务器上传GitHub
 git add .
@@ -52,30 +97,7 @@ git checkout shopid
 
 git pull origin shopid
 
-
-下载更新并重新构建前端：
-
-cd /root/bee-api/web
-git pull
-
-npm install
-npm run serve  # 开发环境
-# 特点：
-- 启动开发服务器，实时编译和热重载
-- 代码不会被压缩混淆
-- 包含 source map，方便调试
-- 直接运行在内存中，不生成实际文件
-- 通常运行在 localhost 上
-
-# 或
-npm run build  # 生产环境
-# 特点：
-- 生成静态文件，通常在 dist 目录下
-- 代码会被压缩混淆，体积更小
-- 移除调试信息
-- 需要 web 服务器（如 nginx）来托管
-- 针对性能做了优化
-
+-------
 
 MySQL 数据库服务:
 systemctl status mysql
@@ -83,4 +105,5 @@ systemctl status mysql
 systemctl start MySQL
 
 
-
+https://api.it120.cc
+oW2Sf7fGCiaCvqJJVpuj9O1TqkKM fabioold

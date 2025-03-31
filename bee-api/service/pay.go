@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gitee.com/stuinfer/bee-api/config"
 	"gitee.com/stuinfer/bee-api/db"
@@ -20,6 +21,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io/ioutil"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -41,7 +43,7 @@ func GetPaySrv() *PaySrv {
 	})
 	return paySrvInstance
 }
-func (fee *PaySrv) getWxPayNotifyUrl(c context.Context, wxPayConfig *model.BeeWxPayConfig) string {
+func (fee *PaySrv) GetWxPayNotifyUrl(c context.Context, wxPayConfig *model.BeeWxPayConfig) string {
 	host := util.IF(wxPayConfig.NotifyUrl == "", config.GetHost(), wxPayConfig.NotifyUrl)
 	return strings.TrimRight(host, "/") + "/" + kit.GetDomain(c) + "/notify/wx/pay"
 }
@@ -54,9 +56,10 @@ func (fee *PaySrv) WxNotify(c context.Context, ip string, req *wechat.V3NotifyRe
 	if req.ResourceType != "encrypt-resource" {
 		return errors.New("暂不支持的回调事件！")
 	}
+
 	// 获取配置
 	var wxPayConfig model.BeeWxPayConfig
-	if err := db.GetDB().Where("user_id = ? and is_deleted = 0").Take(&wxPayConfig).Error; err != nil {
+	if err := db.GetDB().Where("user_id = ? and is_deleted = 0", kit.GetUserId(c)).Take(&wxPayConfig).Error; err != nil {
 		return errors.Wrap(err, "获取微信配置失败！")
 	}
 
@@ -65,7 +68,7 @@ func (fee *PaySrv) WxNotify(c context.Context, ip string, req *wechat.V3NotifyRe
 		Secret:          wxPayConfig.AppSecret,
 		Token:           wxPayConfig.Token,
 		ReturnUrl:       "",
-		NotifyUrl:       fee.getWxPayNotifyUrl(c, &wxPayConfig),
+		NotifyUrl:       fee.GetWxPayNotifyUrl(c, &wxPayConfig),
 		PrivateCertPath: wxPayConfig.PrivateCert,
 		Debug:           wxPayConfig.Debug,
 	})
@@ -77,15 +80,24 @@ func (fee *PaySrv) WxNotify(c context.Context, ip string, req *wechat.V3NotifyRe
 		logger.GetLogger().Debug("微信回调", zap.Any("key", key))
 	}
 	logger.GetLogger().Debug("微信回调", zap.Any("req.SignInfo.HeaderSerial", req.SignInfo.HeaderSerial))
+
 	err = req.VerifySignByPKMap(publicMap)
 	if err != nil {
-		return errors.Wrap(err, "验证微信请求失败！")
+		if err != nil {
+			return errors.Wrap(err, "验证微信请求失败！")
+		}
+
 	}
-	var payResult = &wechat.V3DecryptPayResult{}
-	err = wechat.V3DecryptNotifyCipherTextToStruct(req.Resource.Ciphertext, req.Resource.Nonce, req.Resource.AssociatedData, string(payClient.ApiV3Key), payResult)
+	payResult, err := req.DecryptPayCipherText(wxPayConfig.AppSecret)
 	if err != nil {
-		return errors.Wrap(err, "回调数据解析失败")
+		return errors.Wrap(err, "订单信息解析失败！")
 	}
+
+	//var payResult = &wechat.V3DecryptPayResult{}
+	//err = wechat.V3DecryptNotifyCipherTextToStruct(req.Resource.Ciphertext, req.Resource.Nonce, req.Resource.AssociatedData, string(payClient.ApiV3Key), payResult)
+	//if err != nil {
+	//	return errors.Wrap(err, "回调数据解析失败")
+	//}
 	logger.GetLogger().Info("微信回调", zap.Any("payResult", util.ToJsonWithoutErr(payResult, "")))
 	if payResult.Mchid != wxPayConfig.MchId {
 		return fmt.Errorf("商户号不一致:%v %v！", payResult.Mchid, wxPayConfig.AppId)
@@ -158,7 +170,12 @@ func (fee *PaySrv) dealPayNotify(c context.Context, ip string, payResult *wechat
 			return nil
 		})
 	case enum.PayNextActionTypePayOrder:
-		err = GetOrderSrv().PayOrderByBalance(c, ip, payLog, nextActionJson.Get("id").MustString(), payResult.TransactionId, payerTotal)
+		var id, err = nextActionJson.Get("id").Int()
+		if err != nil {
+			return errors.Wrap(err, "订单id不合法")
+			break
+		}
+		err = GetOrderSrv().PayOrderByBalance(c, ip, payLog, strconv.Itoa(id), payResult.TransactionId, payerTotal)
 	case enum.PayNextActionTypePayDirect:
 		moneyTotal, err := nextActionJson.Get("money").Float64()
 		if err != nil {
@@ -280,33 +297,37 @@ func (fee *PaySrv) GetWechatPayClient(ctx context.Context, cfg *WxPayConfig) (*w
 
 func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, remark string, nextAction string, name string) (*proto.GetWxPayInfoRes, error) {
 	// 获取配置
+	type payAction struct {
+		Type int32 `json:"type"`
+		ID   int64 `json:"id"`
+	}
 	var wxPayConfig model.BeeWxPayConfig
 	var payType = enum.PayNextActionTypeRecharge
-	var nextActionJson *simplejson.Json
+	var nextActionJson payAction
 	var payOrderId string
+	var outTradeNo string
 	var err error
 	if err = db.GetDB().Where("user_id = ? and is_deleted = 0", kit.GetUserId(c)).Take(&wxPayConfig).Error; err != nil {
 		return nil, errors.Wrap(err, "获取微信配置失败！")
 	}
 
 	if len(nextAction) > 0 {
-		nextActionJson, err = simplejson.NewJson([]byte(nextAction))
-		if err != nil {
-			return nil, errors.New("nextAction err")
-		}
-		payType = enum.PayNextActionType(nextActionJson.Get("type").MustInt())
+		_ = json.Unmarshal([]byte(nextAction), &nextActionJson)
+		payType = enum.PayNextActionType(nextActionJson.Type)
 	} else {
 		payType = enum.PayNextActionTypeRecharge
 	}
 	switch payType {
 	case enum.PayNextActionTypePayOrder:
-		orderId := nextActionJson.Get("id").MustString()
-		orderInfo, err := GetOrderSrv().GetOrderByOrderId(c, cast.ToInt64(orderId))
+		orderId := nextActionJson.ID
+		orderInfo, err := GetOrderSrv().GetOrderByOrderId(c, orderId)
 		if err != nil {
 			return nil, err
 		}
 		if orderInfo.Status != enum.OrderStatusUnPaid {
 			return nil, errors.New("订单状态错误")
+		} else {
+			outTradeNo = orderInfo.OrderNumber
 		}
 	}
 	payOrderId = util.GetRandInt64()
@@ -316,7 +337,7 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		Secret:          wxPayConfig.AppSecret,
 		Token:           wxPayConfig.Token,
 		ReturnUrl:       "",
-		NotifyUrl:       fee.getWxPayNotifyUrl(c, &wxPayConfig),
+		NotifyUrl:       fee.GetWxPayNotifyUrl(c, &wxPayConfig),
 		PrivateCertPath: wxPayConfig.PrivateCert,
 		Debug:           wxPayConfig.Debug,
 	})
@@ -333,9 +354,9 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		"out_trade_no": payOrderId,
 		"appid":        wxPayConfig.AppId,
 		"description":  util.IF(remark != "", remark, "订单支付"),
-		"notify_url":   fee.getWxPayNotifyUrl(c, &wxPayConfig),
+		"notify_url":   fee.GetWxPayNotifyUrl(c, &wxPayConfig),
 		"amount": map[string]interface{}{
-			"total":    money.Mul(decimal.NewFromInt(100)).StringFixed(0),
+			"total":    money.Mul(decimal.NewFromInt(100)).IntPart(),
 			"currency": "CNY",
 		},
 		"time_expire": time.Now().Add(time.Hour * 1).Format(time.RFC3339), // 限制一小时内支付
@@ -350,14 +371,15 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		return nil, errors.New("微信请求失败：" + wxResp.Error)
 	}
 	beePayLog := &model.BeePayLog{
-		BaseModel:  *kit.GetInsertBaseModel(c),
-		Money:      money,
-		NextAction: nextAction,
-		OrderNo:    payOrderId,
-		PayGate:    enum.PayGateWXAPP,
-		Remark:     "",
-		Status:     enum.PayLogStatusUnPaid,
-		Uid:        kit.GetUid(c),
+		BaseModel:   *kit.GetInsertBaseModel(c),
+		Money:       money,
+		NextAction:  nextAction,
+		OrderNo:     payOrderId,
+		PayGate:     enum.PayGateWXAPP,
+		Remark:      "",
+		Status:      enum.PayLogStatusUnPaid,
+		Uid:         kit.GetUid(c),
+		OrderNumber: outTradeNo,
 	}
 	err = db.GetDB().Create(beePayLog).Error
 	if err != nil {

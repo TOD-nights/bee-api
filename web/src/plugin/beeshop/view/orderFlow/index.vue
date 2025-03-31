@@ -150,14 +150,15 @@
         <el-table-column
           sortable
           align="left"
-          label="总金额"
-          prop="money"
+          label="用户id"
+          prop="uid"
           width="120"
         />
         <el-table-column
+          sortable
           align="left"
-          label="next_action"
-          prop="nextAction"
+          label="总金额"
+          prop="money"
           width="120"
         />
         <el-table-column
@@ -166,6 +167,23 @@
           prop="shopName"
           width="120"
         />
+        <el-table-column
+          align="left"
+          label="创建时间"
+          prop="dateAdd"
+          width="180"
+        >
+          <template #default="scope">{{
+            formatDate(scope.row.dateAdd)
+          }}</template>
+        </el-table-column>
+        <el-table-column
+          align="left"
+          label="next_action"
+          prop="nextAction"
+          width="120"
+        />
+       
         <el-table-column
           align="left"
           label="订单号"
@@ -196,13 +214,7 @@
             {{ formatEnum(scope.row.status, beePayLogStatus) }}
           </template>
         </el-table-column>
-        <el-table-column
-          sortable
-          align="left"
-          label="用户id"
-          prop="uid"
-          width="120"
-        />
+       
         <el-table-column
           align="left"
           label="已删除"
@@ -213,16 +225,7 @@
             formatBoolean(scope.row.isDeleted)
           }}</template>
         </el-table-column>
-        <el-table-column
-          align="left"
-          label="创建时间"
-          prop="dateAdd"
-          width="180"
-        >
-          <template #default="scope">{{
-            formatDate(scope.row.dateAdd)
-          }}</template>
-        </el-table-column>
+       
         <el-table-column
           align="left"
           label="更新时间"
