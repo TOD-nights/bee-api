@@ -4514,3 +4514,68 @@ net/http.(*conn).serve
 [info] request url: https://api.weixin.qq.com/sns/jscode2session?appid=wxf9be667c59929008&grant_type=authorization_code&js_code=0c1TRCkl27lJjf4jQJol2ongUv0TRCk4&secret=ff7ab953f4a349d401cae151ca51b42e
 [GIN] 2025/03/31 - 12:44:45 | 200 |  138.844824ms |    36.21.241.11 | POST     "/9kuai8coffee.asia/user/wxapp/authorize"
 [GIN] 2025/03/31 - 12:44:46 | 200 |    2.039893ms |    36.21.241.11 | POST     "/9kuai8coffee.asia/shop/subshop/list"
+[GIN] 2025/03/31 - 12:54:22 | 200 |    2.148088ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/config/values?keys=mallName%2CmyBg%2CmapPos%2Corder_hx_uids%2Csubscribe_ids%2Cshare_profile%2Czxdz%2Cadmin_uids%2Cshop_goods_split%2CQQ_MAP_KEY%2Cshop_join_open%2Ccreate_order_select_time%2Cpackaging_fee%2CcustomerServiceChatCorpId%2CcustomerServiceChatUrl"
+[GIN] 2025/03/31 - 12:54:22 | 200 |    1.796755ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/subshop/detail/v2?id=1"
+[GIN] 2025/03/31 - 12:54:22 | 200 |    2.088406ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/goods/category/all"
+[GIN] 2025/03/31 - 12:54:22 | 200 |    1.690869ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/notice/last-one?type="
+[GIN] 2025/03/31 - 12:54:22 | 200 |    1.572276ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/banner/list"
+
+2025/03/31 12:54:22 [31;1m/root/bee-api/bee-api/service/token.go:64 [35;1mrecord not found
+[0m[33m[0.691ms] [34;1m[rows:0][0m SELECT * FROM `bee_token` WHERE token = '425a76ea0a0011f087e800163e1e690b' LIMIT 1
+[GIN] 2025/03/31 - 12:54:22 | 200 |    1.654488ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shopping-cart/info?token=425a76ea0a0011f087e800163e1e690b&type="
+[GIN] 2025/03/31 - 12:54:23 | 200 |    2.518035ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/list"
+[info] request url: https://api.weixin.qq.com/sns/jscode2session?appid=wxf9be667c59929008&grant_type=authorization_code&js_code=0c1TNd0w3uEGE430vt2w3QnAMz1TNd0Y&secret=ff7ab953f4a349d401cae151ca51b42e
+[GIN] 2025/03/31 - 12:54:23 | 200 |  134.841909ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/user/wxapp/authorize"
+[info] request url: https://api.weixin.qq.com/sns/jscode2session?appid=wxf9be667c59929008&grant_type=authorization_code&js_code=0f1ANyml233ykf4vXkol2v9qeg3ANymP&secret=ff7ab953f4a349d401cae151ca51b42e
+[GIN] 2025/03/31 - 12:54:23 | 200 |  120.285704ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/user/wxapp/authorize"
+[GIN] 2025/03/31 - 12:54:32 | 200 |    1.831379ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/goods/goodsAddition?goodsId=2025741"
+[GIN] 2025/03/31 - 12:54:32 | 200 |     817.249µs |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/times/schedule"
+[GIN] 2025/03/31 - 12:54:32 | 200 |    7.306372ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/goods/detail?id=2025741&token="
+[GIN] 2025/03/31 - 12:54:39 | 200 |    3.958689ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/price"
+2025-03-31T12:54:40.747+0800	INFO	api/shopping_cart.go:30	添加购物车	{"uid": 85, "goodsId": 2025741, "number": 1, "sku": "[{\"optionId\":211246,\"optionValueId\":1686934},{\"optionId\":211247,\"optionValueId\":1686939}]", "addition": ""}
+
+2025/03/31 12:54:40 [31;1m/root/bee-api/bee-api/service/shopping_card.go:52 [35;1mrecord not found
+[0m[33m[0.774ms] [34;1m[rows:0][0m SELECT * FROM `bee_shopping_cart` WHERE uid = 85 and sku_id = 97 LIMIT 1
+[GIN] 2025/03/31 - 12:54:40 | 200 |   17.653886ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shopping-cart/add"
+[GIN] 2025/03/31 - 12:54:40 | 200 |    8.615005ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shopping-cart/info?token=375051ab0dec11f0b47400163e1e690b&type="
+[GIN] 2025/03/31 - 12:54:44 | 200 |      2.0987ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/list"
+[GIN] 2025/03/31 - 12:54:46 | 200 |    1.842947ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/goods/goodsAddition?goodsId=2025745"
+[GIN] 2025/03/31 - 12:54:46 | 200 |    2.928464ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/times/schedule"
+[GIN] 2025/03/31 - 12:54:46 | 200 |    8.092462ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/goods/detail?id=2025745&token="
+[GIN] 2025/03/31 - 12:54:50 | 200 |    4.168965ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/price"
+2025-03-31T12:54:52.642+0800	INFO	api/shopping_cart.go:30	添加购物车	{"uid": 85, "goodsId": 2025745, "number": 2, "sku": "[{\"optionId\":211246,\"optionValueId\":1686936},{\"optionId\":211247,\"optionValueId\":1686938}]", "addition": ""}
+
+2025/03/31 12:54:52 [31;1m/root/bee-api/bee-api/service/shopping_card.go:52 [35;1mrecord not found
+[0m[33m[0.737ms] [34;1m[rows:0][0m SELECT * FROM `bee_shopping_cart` WHERE uid = 85 and sku_id = 331 LIMIT 1
+[GIN] 2025/03/31 - 12:54:52 | 200 |   21.778362ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shopping-cart/add"
+[GIN] 2025/03/31 - 12:54:52 | 200 |    11.52276ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shopping-cart/info?token=375051ab0dec11f0b47400163e1e690b&type="
+[GIN] 2025/03/31 - 12:54:52 | 200 |    2.111341ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shop/goods/list"
+[GIN] 2025/03/31 - 12:54:54 | 200 |    2.821991ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/detail?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:54:54 | 200 |    1.798145ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/fee/peisong/list"
+[GIN] 2025/03/31 - 12:54:54 | 200 |    2.736829ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/check-token?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:54:54 | 200 |   11.266542ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shopping-cart/info?token=375051ab0dec11f0b47400163e1e690b&type="
+
+2025/03/31 12:54:54 [31;1m/root/bee-api/bee-api/service/address.go:247 [35;1mrecord not found
+[0m[33m[0.782ms] [34;1m[rows:0][0m SELECT * FROM `bee_user_address` WHERE is_default = 1 and uid = 85 and is_deleted = 0 LIMIT 1
+[GIN] 2025/03/31 - 12:54:54 | 200 |    3.404385ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/shipping-address/default/v2?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:54:55 | 200 |   11.442995ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/order/create"
+[GIN] 2025/03/31 - 12:55:06 | 200 |   14.913157ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/user/wxapp/bindMobile"
+[GIN] 2025/03/31 - 12:55:09 | 200 |   26.554017ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/order/create"
+[GIN] 2025/03/31 - 12:55:10 | 200 |     8.89051ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/shopping-cart/empty"
+[GIN] 2025/03/31 - 12:55:10 | 200 |    3.454546ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/amount?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:55:10 | 200 |   36.639061ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/order/pay"
+
+2025/03/31 12:55:10 [31;1m/root/bee-api/bee-api/service/order.go:1072 [35;1mrecord not found
+[0m[33m[0.823ms] [34;1m[rows:0][0m SELECT * FROM `bee_order_logistics` WHERE order_id = 682 LIMIT 1
+2025-03-31T12:55:10.168+0800	DEBUG	service/printer.go:67	订单不属于该打印机	{"printer": {"id":2,"userId":100,"isDeleted":false,"dateAdd":"2025-03-17 17:55:52","dateUpdate":"2025-03-19 16:37:09","dateDelete":{"Time":"0001-01-01T00:00:00Z","Valid":false},"appid":"xu1271669848@gmail.com","app_secret":"FcEApw7T","name":"98","key":"kVBTc5n7kWLp87E4","brand":2,"condition":1,"code":"922376707","num":1,"shopId":2,"template":"订单号：{{.order.OrderNumber}}\n订单金额：{{.order.Amount}}\n用户ID：{{.order.UserId}}\n订单状态：{{.order.Status}}\n店铺名称：{{.order.ShopNameZt}}\n支付状态：{{if .order.IsPay}}已支付{{else}}未支付{{end}}\n下单时间：{{.nowStr}}\n商品数量：{{.order.GoodsNumber}}\n订单类型：{{.order.OrderType}}\n备注：{{.order.Remark}}\n{{if .user}}\n用户信息：\n  用户昵称：{{.user.Nick}}\n  手机号：{{.user.Mobile}}\n  会员等级：{{.user.VipLevel}}\n  余额：{{.userCash.Balance.Value}}\n{{end}}\n{{if .goods}}\n商品信息：\n{{range .goods}}\n  商品名称：{{.GoodsName}}\n  商品数量：{{.Number}}\n  商品金额：{{.Amount.Value}}\n{{end}}\n{{end}}","voice":""}, "order": {"id":682,"userId":100,"isDeleted":false,"dateAdd":"2025-03-31 12:55:09","dateUpdate":"2025-03-31 12:55:10","dateDelete":{"Time":"0001-01-01T00:00:00Z","Valid":false},"amount":"29.4","amountCard":"0","amountCoupons":"0","amountLogistics":"0","amountBalance":"0","amountReal":"29.4","amountRefundTotal":"0","amountTax":"0","amountTaxGst":"0","amountTaxService":"0","autoDeliverStatus":2,"dateClose":"2025-03-31 13:25:09","datePay":"2025-03-31 12:55:10","goodsNumber":3,"hasRefund":false,"hxNumber":"202503311538779071","ip":"36.21.214.70","isCanHx":true,"isDelUser":false,"isEnd":false,"isHasBenefit":false,"isNeedLogistics":false,"isPay":true,"isScoreOrder":false,"isSuccessPingtuan":false,"orderNumber":"202503317967155817","orderType":0,"pid":0,"qudanhao":"595","refundStatus":0,"remark":"","score":0,"scoreDeduction":0,"shopId":1,"shopIdZt":1,"shopNameZt":"9.8 COFFEE 未来社区店","status":1,"trips":"0","type":0,"uid":85,"extJsonStr":"{\"联系电话\":\"13905782050\"}","peisongType":"zq","orderGoods":[{"id":781,"userId":100,"isDeleted":false,"dateAdd":"2025-03-31 12:55:09","dateUpdate":"2025-03-31 12:55:10","dateDelete":{"Time":"0001-01-01T00:00:00Z","Valid":false},"afterSale":"2","hadPayAmount":"0","amount":"9.8","amountCoupon":"0","amountSingle":"12.8","amountSingleBase":"12.8","buyRewardEnd":false,"categoryId":449487,"cyTableStatus":0,"fxType":0,"goodsId":2025741,"goodsName":"意式浓缩（乌干达豆）","goodsSubName":"","isScoreOrder":false,"number":1,"numberNoFahuo":0,"orderId":682,"persion":0,"pic":"https://taletape-video-dev.oss-eu-central-1.aliyuncs.com/9.8compress/wgd%20ys.jpg","priceId":0,"property":"口感:热,甜度:标准甜,","propertyChildIds":",211246:1686934,211247:1686939","purchase":true,"refundStatus":0,"score":"0","shopId":0,"status":0,"type":0,"uid":85,"unit":"份","weight":"1"},{"id":782,"userId":100,"isDeleted":false,"dateAdd":"2025-03-31 12:55:09","dateUpdate":"2025-03-31 12:55:10","dateDelete":{"Time":"0001-01-01T00:00:00Z","Valid":false},"afterSale":"2","hadPayAmount":"0","amount":"19.6","amountCoupon":"0","amountSingle":"12.8","amountSingleBase":"12.8","buyRewardEnd":false,"categoryId":449487,"cyTableStatus":0,"fxType":0,"goodsId":2025745,"goodsName":"生椰拿铁（乌干达豆）","goodsSubName":"","isScoreOrder":false,"number":2,"numberNoFahuo":0,"orderId":682,"persion":0,"pic":"https://taletape-video-dev.oss-eu-central-1.aliyuncs.com/9.8compress/wgd%20synt.jpg","priceId":0,"property":"口感:常温,甜度:微甜,","propertyChildIds":",211246:1686936,211247:1686938","purchase":true,"refundStatus":0,"score":"0","shopId":0,"status":0,"type":0,"uid":85,"unit":"份","weight":"2"}],"OrderLogistics":{"id":0,"userId":0,"isDeleted":false,"dateAdd":"0001-01-01 00:00:00","dateUpdate":"0001-01-01 00:00:00","dateDelete":{"Time":"0001-01-01T00:00:00Z","Valid":false},"address":"","areaStr":"","cityId":"","cityStr":"","districtId":"","isDefault":false,"latitude":0,"linkMan":"","longitude":0,"mobile":"","provinceId":"","provinceStr":"","status":0,"uid":0,"orderId":0,"dadaShopNo":"","shopId":0}}}
+2025-03-31T12:55:10.168+0800	INFO	service/printer.go:286	打印订单成功	{"item": {"id":251,"userId":100,"isDeleted":false,"dateAdd":"2025-03-31 12:55:10","dateUpdate":"2025-03-31 12:55:10","dateDelete":{"Time":"0001-01-01T00:00:00Z","Valid":false},"orderId":682,"condition":1,"status":0,"errMsg":"","tryTimes":0,"lastTryUnix":0}}
+[GIN] 2025/03/31 - 12:55:10 | 200 |    2.738789ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/check-token?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:55:10 | 200 |    6.838392ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/order/list"
+[GIN] 2025/03/31 - 12:56:27 | 200 |    2.125387ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/subshop/detail/v2?id=1"
+[GIN] 2025/03/31 - 12:56:28 | 200 |     2.53207ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/check-token?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:56:28 | 200 |    2.466621ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/check-token?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 12:56:28 | 200 |    6.948912ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/order/list"
+[GIN] 2025/03/31 - 13:01:03 | 200 |    2.200931ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/shop/subshop/detail/v2?id=1"
+[GIN] 2025/03/31 - 13:01:03 | 200 |    2.771108ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/check-token?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 13:01:04 | 200 |    2.589641ms |    36.21.214.70 | GET      "/9kuai8coffee.asia/user/check-token?token=375051ab0dec11f0b47400163e1e690b"
+[GIN] 2025/03/31 - 13:01:04 | 200 |    7.156072ms |    36.21.214.70 | POST     "/9kuai8coffee.asia/order/list"
