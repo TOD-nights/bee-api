@@ -41,7 +41,7 @@
         style="width: 100%;"
         :span-method="spanMethodHandler"
       >
-        <el-table-column prop="orderNumber" label="订单号" width="200" />
+        <el-table-column prop="orderNumber" label="订单号" width="170" />
         <el-table-column
           prop="amount"
           label="订单金额"
