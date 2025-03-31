@@ -6,6 +6,7 @@ import (
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/kit"
+	"gitee.com/stuinfer/bee-api/logger"
 	"gitee.com/stuinfer/bee-api/model"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
@@ -100,6 +101,25 @@ func (srv *BalanceSrv) OperAmountByTx(c context.Context, tx *gorm.DB, userId int
 			if err := fun(tx); err != nil {
 				return err
 			}
+		}
+		var userAmount model.BeeUserAmount
+		if err := tx.Model(&model.BeeUserAmount{}).Where("uid = ?", userId).Take(&userAmount).Error; err != nil {
+			logger.GetLogger().Info(err.Error())
+			return err
+		}
+		var item model.BeeUser
+		err := tx.Model(&model.BeeUser{}).Where("id = ?", userId).Take(&item).Error
+		if err != nil {
+			logger.GetLogger().Info(err.Error())
+			return err
+		}
+		if userAmount.Balance.GreaterThanOrEqual(decimal.NewFromFloat(100.00)) {
+			item.VipLevel = 1
+		} else if userAmount.Balance.LessThan(decimal.NewFromFloat(9.80)) {
+			item.VipLevel = 0
+		}
+		if err := tx.Save(item).Error; err != nil {
+			return errors.New("变更用户等级信息失败")
 		}
 		return tx.Save(&model.BeeUserBalanceLog{
 			BaseModel:   *kit.GetInsertBaseModel(c),

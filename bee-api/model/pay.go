@@ -11,6 +11,7 @@ type BeePayLog struct {
 	Money        decimal.Decimal   `gorm:"column:money;type:decimal(10,2);comment:总金额" json:"money"`
 	NextAction   string            `gorm:"column:next_action;type:varchar(100);comment:next_action" json:"nextAction"`
 	OrderNo      string            `gorm:"column:order_no;type:varchar(100);comment:订单号" json:"orderNo"`
+	OrderNumber  string            `gorm:"column:order_number;type:varchar(255);comment:order 表的orderNumber订单号" json:"orderNumber"`
 	ThirdOrderNo string            `gorm:"column:third_order_no;type:varchar(200);comment:第三方订单号" json:"thirdOrderNo"`
 	PayGate      enum.PayGate      `gorm:"column:pay_gate;type:varchar(100);comment:pay_gate" json:"payGate"`
 	PayGateStr   string            `gorm:"-" json:"payGateStr"`

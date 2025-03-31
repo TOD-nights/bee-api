@@ -118,6 +118,9 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Logger(), gin.Recovery())
 	router.StaticFS(config2.GetStorePath(), justFilesFilesystem{http.Dir(config2.GetStorePath())})
 	router.POST("/upload2", regSysUserByPostForm(), CheckToken(), (api.DfsApi{}).UploadFile)
+	//router.GET("/test", func(c *gin.Context) {
+	//	c.JSON(200, gin.H{"测试": "测试frps"})
+	//})
 	router.GET("/yunlaba/bind.html", func(context *gin.Context) {
 		source := context.Query("source")
 		timestamp := context.Query("timestamp")
@@ -152,7 +155,7 @@ func NewRouter() *gin.Engine {
 		{ //商品
 			shopGroup.GET("/goods/category/all", (api.GoodsApi{}).CategoryAll)
 			shopGroup.POST("/goods/list", (api.GoodsApi{}).List)
-			shopGroup.GET("/goods/list/v2", (api.GoodsApi{}).List)
+			shopGroup.POST("/goods/list/v2", (api.GoodsApi{}).List)
 			shopGroup.POST("/goods/price", (api.GoodsApi{}).Price)
 			shopGroup.GET("/goods/detail", (api.GoodsApi{}).Detail)
 			shopGroup.GET("/goods/goodsAddition", (api.GoodsApi{}).GoodsAddition)
