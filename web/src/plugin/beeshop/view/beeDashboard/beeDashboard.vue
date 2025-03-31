@@ -22,8 +22,8 @@
             type="daterange"
             style="width: 100%; box-sizing: border-box"
             range-separator="到"
-            start-placeholder="请选择开始日期"
-            end-placeholder="请选择结束日期"
+            start-placeholder="开始"
+            end-placeholder="结束"
           />
         </el-col>
         <el-col
