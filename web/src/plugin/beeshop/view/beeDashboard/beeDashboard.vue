@@ -2,42 +2,7 @@
   <div
     class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 py-2 gap-4 md:gap-2 gva-container2"
   >
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/shop-user-admin/beeUser')"
-    >
-      <gva-chart :data="userData" title="用户数" />
-    </gva-card>
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
-    >
-      <gva-chart :data="orderData" title="订单统计" />
-    </gva-card>
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/bee_goods_admin/beeShopGoods')"
-    >
-      <gva-chart :data="goodsData" title="商品数量" />
-    </gva-card>
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeOrderTodo')"
-    >
-      <gva-chart :data="orderTodoData" title="订单待办" />
-    </gva-card>
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
-    >
-      <gva-chart :data="payData" title="总支付金额" />
-    </gva-card>
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
-    >
-      <gva-chart :data="payNumData" title="支付人数" />
-    </gva-card>
+    
     <gva-card custom-class="col-span-1 lg:col-span-6" title="支付流水">
       <el-row>
         <el-col :span="4">
@@ -73,7 +38,7 @@
       <el-table
         :data="orders"
         stripe
-        style="width: 100%; height: 200px"
+        style="width: 100%;"
         :span-method="spanMethodHandler"
       >
         <el-table-column prop="orderNumber" label="订单号" width="200" />
@@ -91,6 +56,49 @@
         </el-table-column>
       </el-table>
     </gva-card>
+
+
+
+    
+    <gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/shop-user-admin/beeUser')"
+    >
+      <gva-chart :data="userData" title="用户数" />
+    </gva-card>
+
+
+    <gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
+    >
+      <gva-chart :data="orderData" title="订单统计" />
+    </gva-card>
+    
+    
+    <gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/beeOrderTodo')"
+    >
+      <gva-chart :data="orderTodoData" title="订单待办" />
+    </gva-card>
+
+
+    <gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
+    >
+      <gva-chart :data="payData" title="总支付金额" />
+    </gva-card>
+
+
+    <gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
+    >
+      <gva-chart :data="payNumData" title="支付人数" />
+    </gva-card>
+
 
     <gva-card
       title="待办事项"
