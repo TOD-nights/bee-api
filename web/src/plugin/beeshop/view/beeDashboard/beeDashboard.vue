@@ -61,11 +61,20 @@
 
 
 <!-- 添加今日流水卡片 -->
+ <!-- 全部商店-->
 <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
       @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
     >
-      <gva-chart :data="[todayAmount]" title="今日流水" />
+      <gva-chart :data="[todayAmount]" title="今日全部商店充值和消费金额" />
+    </gva-card>
+
+<!-- 单个商店-->
+    <gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
+    >
+      <gva-chart :data="[todayAmountSelect]" title="今日选择商店充值和消费金额" />
     </gva-card>
 
     
@@ -74,7 +83,7 @@
       custom-class="col-span-1 lg:col-span-2 h-32"
       @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
     >
-      <gva-chart :data="[todayOrderCount]" title="今日订单数" />
+      <gva-chart :data="[todayOrderCount]" title="今日全部商店订单数" />
 </gva-card>
 
     
@@ -110,12 +119,14 @@
     </gva-card>
 
 
+    <!-- 添加今日流水卡片 
+
     <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
       @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
     >
       <gva-chart :data="payNumData" title="支付人数" />
-    </gva-card>
+    </gva-card>-->
 
 
     <gva-card
@@ -153,7 +164,8 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+
+import { reactive, ref, watch } from "vue";
 import { GvaChart, GvaCard } from "./componenst";
 import { dayjs } from "element-plus";
 import { getBeeUserList } from "@/plugin/beeshop/api/beeUser";
@@ -191,6 +203,10 @@ const todayAmount = ref(0);
 // 添加今日订单数相关的数据
 const todayOrderCount = ref(0);
 
+// 添加新的变量
+const todayAmountSelect = ref(0);
+
+
 // 在 init 函数中添加获取今日流水的逻辑
 const getTodayAmount = async () => {
   const today = dayjs().startOf('day').toDate();
@@ -209,7 +225,36 @@ const getTodayAmount = async () => {
   }
 };
 
+// 添加新的函数来获取选中商店的今日流水
+// 修改获取选中商店的今日流水的函数
+const getTodayAmountSelect = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+  // 使用 orderList 而不是 getBeePayTotal
+  const todayOrders = await orderList({
+    page: 1,
+    pageSize: 1000,  // 设置较大的数值以获取所有订单
+    shopId: shopId.value,
+    startDateAdd: today,
+    endDateAdd: tonight
+  });
 
+  if (todayOrders.code === 0) {
+    // 计算总金额
+    todayAmountSelect.value = todayOrders.data.sum || 0;
+  }
+};
+
+// 修改 watch 监听器
+watch(shopId, async (newVal) => {
+  console.log('商店ID变化:', newVal); // 添加日志
+  if (newVal) {  // 只有当有选择值时才调用
+    await getTodayAmountSelect();
+  } else {
+    todayAmountSelect.value = 0; // 没有选择时清零
+  }
+}, { immediate: true });  // 添加 immediate: true 确保初始化时也会触发
 // 获取今日订单数的方法
 const getTodayOrderCount = async () => {
   const today = dayjs().startOf('day').toDate();
@@ -229,6 +274,7 @@ const getTodayOrderCount = async () => {
 
 const init = async () => {
   await getTodayAmount(); // 初始化时获取今日流水
+  await getTodayAmountSelect(); // 初始化时获取今日选择商店流水
   await getTodayOrderCount(); // 获取今日订单数
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
