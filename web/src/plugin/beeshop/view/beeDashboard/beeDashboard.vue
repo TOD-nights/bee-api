@@ -5,59 +5,81 @@
     class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 py-2 gap-4 md:gap-2 gva-container2"
   >
     
-    <gva-card custom-class="col-span-1 lg:col-span-6" title="消费流水">
-      <el-row>
-        <el-col :span="4">
-          <el-select v-model="shopId" placeholder="请选择门店">
-            <el-option
-              v-for="(item, index) in shops"
-              :key="index"
-              :value="item.id"
-              :label="item.name"
-              >{{ item.name }}</el-option
-            >
-          </el-select>
-        </el-col>
-        <el-col :span="4">
-          <el-date-picker
-            v-model="dates"
-            type="daterange"
-            style="width: 100%; box-sizing: border-box"
-            range-separator="到"
-            start-placeholder="开始"
-            end-placeholder="结束"
-          />
-        </el-col>
-        <el-col
-          :span="1"
-          style="display: flex; justify-content: center; align-items: center"
-        >
-          <el-button @click="refreshOrders">
-            <el-icon><Search /></el-icon>
-          </el-button>
-        </el-col>
-      </el-row>
-      <el-table
-        :data="orders"
-        stripe
-        style="width: 100%;"
-        :span-method="spanMethodHandler"
+  <gva-card custom-class="col-span-1 lg:col-span-6" title="消费流水">
+  <!-- 修改搜索栏布局 -->
+  <el-row :gutter="10" class="mb-4">
+    <!-- 在手机上占满宽度，在大屏幕上占4格 -->
+    <el-col :xs="24" :sm="24" :md="8" :lg="6" class="mb-2">
+      <el-select 
+        v-model="shopId" 
+        placeholder="请选择门店"
+        style="width: 100%"
       >
-        <el-table-column prop="orderNumber" label="订单号" width="170" />
-        <el-table-column
-          prop="amount"
-          label="订单金额"
-          align="center"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column prop="datePay" label="支付时间">
-          <template #default="scope">
-            {{ dateFmt(scope.row.dateAdd) }}
-          </template>
-        </el-table-column>
-      </el-table>
-    </gva-card>
+        <el-option
+          v-for="(item, index) in shops"
+          :key="index"
+          :value="item.id"
+          :label="item.name"
+        >{{ item.name }}</el-option>
+      </el-select>
+    </el-col>
+    
+    <!-- 在手机上占满宽度，在大屏幕上占8格 -->
+    <el-col :xs="24" :sm="24" :md="12" :lg="10" class="mb-2">
+      <el-date-picker
+        v-model="dates"
+        type="daterange"
+        style="width: 100%"
+        range-separator="到"
+        start-placeholder="开始"
+        end-placeholder="结束"
+      />
+    </el-col>
+    
+    <!-- 搜索按钮 -->
+    <el-col :xs="24" :sm="24" :md="4" :lg="2" class="mb-2">
+      <el-button 
+        @click="refreshOrders"
+        style="width: 100%"
+      >
+        <el-icon><Search /></el-icon>
+        <span>搜索</span>
+      </el-button>
+    </el-col>
+  </el-row>
+
+  <!-- 表格部分 -->
+  <el-table
+    :data="orders"
+    stripe
+    style="width: 100%"
+    :span-method="spanMethodHandler"
+  >
+    <!-- 在手机上隐藏订单号列 -->
+    <el-table-column 
+      prop="orderNumber" 
+      label="订单号" 
+      width="170" 
+      :visible="false"
+      class="hidden sm:table-cell"
+    />
+    <el-table-column
+      prop="amount"
+      label="订单金额"
+      align="center"
+      show-overflow-tooltip
+    />
+    <el-table-column 
+      prop="datePay" 
+      label="支付时间"
+      min-width="120"
+    >
+      <template #default="scope">
+        {{ dateFmt(scope.row.dateAdd) }}
+      </template>
+    </el-table-column>
+  </el-table>
+</gva-card>
 
 
 <!-- 添加今日流水卡片 -->
