@@ -184,7 +184,7 @@ const todayAmount = ref(0);
 const getTodayAmount = async () => {
   const today = dayjs().startOf('day').toDate();
   const tonight = dayjs().endOf('day').toDate();
-  
+    // 调用API获取今日支付总额
   const todayPayment = await getBeePayTotal({
     page: 1,
     pageSize: 1,
@@ -192,14 +192,14 @@ const getTodayAmount = async () => {
     endDateAdd: tonight,
     sum: "money"
   });
-
+  // 如果请求成功，更新todayAmount的值
   if (todayPayment.code === 0) {
     todayAmount.value = todayPayment.data.total || 0;
   }
 };
 
 const init = async () => {
-  await getTodayAmount(); // 添加这一行
+  await getTodayAmount(); // 初始化时获取今日流水
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   for (let i = 7; i >= 0; i--) {
