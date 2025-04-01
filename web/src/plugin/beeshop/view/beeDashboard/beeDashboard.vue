@@ -77,6 +77,17 @@
       <gva-chart :data="[todayAmountSelect]" title="今日选择商店充值和消费金额" />
     </gva-card>
 
+
+
+
+    <!-- 添加今日选中商店消费金额卡片 -->
+<gva-card
+  custom-class="col-span-1 lg:col-span-2 h-32"
+  @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
+>
+  <gva-chart :data="[todayConsumAmountSelect]" title="今日选择商店消费金额" />
+</gva-card>
+
     
     <!-- 添加今日订单数卡片 -->
 <gva-card
@@ -214,6 +225,7 @@ const todayOrderCount = ref(0);
 // 添加新的变量
 const todayAmountSelect = ref(0);
 const todayOrderCountSelect = ref(0);
+const todayConsumAmountSelect = ref(0);
 
 // 在 init 函数中添加获取今日流水的逻辑
 const getTodayAmount = async () => {
@@ -272,14 +284,36 @@ const getTodayOrderCountSelect = async () => {
   }
 };
 
+// 添加新函数来获取选中商店的今日消费金额
+const getTodayConsumAmountSelect = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+  const todayOrders = await orderList({
+    page: 1,
+    pageSize: 1000,
+    shopId: shopId.value,
+    startDateAdd: today,
+    endDateAdd: tonight,
+    type: 'consum'  // 添加消费类型筛选
+  });
+
+  if (todayOrders.code === 0) {
+    todayConsumAmountSelect.value = todayOrders.data.sum || 0;
+  }
+};
+
 // 修改 watch 监听器
 watch(shopId, async (newVal) => {
   if (newVal) {  // 只有当有选择值时才调用
     await getTodayAmountSelect();
     await getTodayOrderCountSelect();
+    await getTodayConsumAmountSelect();
   } else {
     todayAmountSelect.value = 0; // 没有选择时清零
     todayOrderCountSelect.value = 0;
+    todayConsumAmountSelect.value = 0;
+
   }
 }, { immediate: true });  // 添加 immediate: true 确保初始化时也会触发
 
@@ -304,6 +338,9 @@ const init = async () => {
   await getTodayAmount(); // 初始化时获取今日流水
   await getTodayAmountSelect(); // 初始化时获取今日选择商店流水
   await getTodayOrderCount(); // 获取今日订单数
+  await getTodayOrderCountSelect();
+  await getTodayConsumAmountSelect(); // 添加这行
+
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   for (let i = 7; i >= 0; i--) {
@@ -421,7 +458,7 @@ const refreshOrders = async () => {
     endDateAdd:dates.value[1]
   });
   if (ordersRes.code == 0) {
-    console.log(ordersRes.data.list, "234234");
+    console.log(ordersRes.data.list, "ordersRes.data.list");
     orders.value = [
       ...ordersRes.data.list,
       { amount: ordersRes.data.sum, orderNumber: "合计" },
