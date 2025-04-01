@@ -86,6 +86,14 @@
       <gva-chart :data="[todayOrderCount]" title="今日全部商店订单数" />
 </gva-card>
 
+<!-- 添加选中商店今日订单数卡片 -->
+<gva-card
+  custom-class="col-span-1 lg:col-span-2 h-32"
+  @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
+>
+  <gva-chart :data="[todayOrderCountSelect]" title="今日选择商店订单数" />
+</gva-card>
+
     
     <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
@@ -205,7 +213,7 @@ const todayOrderCount = ref(0);
 
 // 添加新的变量
 const todayAmountSelect = ref(0);
-
+const todayOrderCountSelect = ref(0);
 
 // 在 init 函数中添加获取今日流水的逻辑
 const getTodayAmount = async () => {
@@ -246,15 +254,35 @@ const getTodayAmountSelect = async () => {
   }
 };
 
+// 添加新函数来获取选中商店的今日订单数
+const getTodayOrderCountSelect = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+  const todayOrders = await orderList({
+    page: 1,
+    pageSize: 1,
+    shopId: shopId.value,
+    startDateAdd: today,
+    endDateAdd: tonight
+  });
+
+  if (todayOrders.code === 0) {
+    todayOrderCountSelect.value = todayOrders.data.total || 0;
+  }
+};
+
 // 修改 watch 监听器
 watch(shopId, async (newVal) => {
-  console.log('商店ID变化:', newVal); // 添加日志
   if (newVal) {  // 只有当有选择值时才调用
     await getTodayAmountSelect();
+    await getTodayOrderCountSelect();
   } else {
     todayAmountSelect.value = 0; // 没有选择时清零
+    todayOrderCountSelect.value = 0;
   }
 }, { immediate: true });  // 添加 immediate: true 确保初始化时也会触发
+
 // 获取今日订单数的方法
 const getTodayOrderCount = async () => {
   const today = dayjs().startOf('day').toDate();
