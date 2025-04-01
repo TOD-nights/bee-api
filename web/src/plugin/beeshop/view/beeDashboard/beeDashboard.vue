@@ -116,7 +116,7 @@
   <gva-chart :data="[todayOrderCountSelect]" title="今日选择商店订单数" />
 </gva-card>
 
-    
+    <!--
     <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
       @click="gotoPage('/bee_index/shop-user-admin/beeUser')"
@@ -148,8 +148,7 @@
       <gva-chart :data="payData" title="总支付金额" />
     </gva-card>
 
-
-    <!-- 添加今日流水卡片 
+ 添加今日流水卡片 
 
     <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
