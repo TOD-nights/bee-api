@@ -130,7 +130,7 @@ func (srv *CouponSrv) FetchCoupon(c context.Context, userInfo *model.BeeUser, id
 		uniqStr = time.Now().Format("2006")
 	}
 
-	if db.GetDB().Where("uniq = ? and is_deleted = 0", uniqStr).Take(couponLog); err != nil {
+	if err = db.GetDB().Where("uniq = ? and is_deleted = 0", uniqStr).Take(couponLog).Error; err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
@@ -156,9 +156,9 @@ func (srv *CouponSrv) FetchCoupon(c context.Context, userInfo *model.BeeUser, id
 
 	switch coupon.DateEndType {
 	case enum.CouponDateEndTypeDelay:
-		expireMills = time.Time(coupon.DateEnd).AddDate(0, 0, coupon.DateEndDays).UnixMilli()
+		expireMills = time.Now().AddDate(0, 0, coupon.DateEndDays).UnixMilli()
 	case enum.CouponDateEndTypeFixed:
-		expireMills = time.Time(coupon.DateEnd).UnixMilli() - time.Now().UnixMilli()
+		expireMills = time.Time(coupon.DateEnd).UnixMilli()
 
 	}
 
@@ -178,11 +178,11 @@ func (srv *CouponSrv) FetchCoupon(c context.Context, userInfo *model.BeeUser, id
 			return enum.NewBussErr(nil, 30005, "优惠券已经被领完了")
 		}
 		if err := tx.Create(&model.BeeUserCoupon{
-			BaseModel:    *kit.GetInsertBaseModel(c),
-			Uid:          userInfo.Id,
-			DateStart:    dateStart,
-			ExpiryMillis: expireMills,
-			//Money:         coupon.NeedAmount,
+			BaseModel:     *kit.GetInsertBaseModel(c),
+			Uid:           userInfo.Id,
+			DateStart:     dateStart,
+			ExpiryMillis:  expireMills,
+			Money:         coupon.MoneyMin,
 			MoneyHreshold: coupon.MoneyHreshold,
 			MoneyMin:      coupon.MoneyMin,
 			MoneyMax:      coupon.MoneyMax,

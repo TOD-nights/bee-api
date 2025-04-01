@@ -13,7 +13,7 @@ type DiscountsApi struct {
 
 func (api DiscountsApi) Statistics(c *gin.Context) {
 	userInfo := api.GetUserInfo(c)
-	data, err := service.GetCouponSrv().GetMyCouponStatistics(userInfo.UserId)
+	data, err := service.GetCouponSrv().GetMyCouponStatistics(userInfo.Id)
 	if err != nil {
 		api.Fail(c, enum.ResCodeFail, err.Error())
 		return
@@ -24,7 +24,7 @@ func (api DiscountsApi) Statistics(c *gin.Context) {
 func (api DiscountsApi) My(c *gin.Context) {
 	userInfo := api.GetUserInfo(c)
 	status := cast.ToInt(c.Query("status"))
-	data, err := service.GetCouponSrv().GetMyCouponListByStatus(userInfo.UserId, enum.CouponStatus(status))
+	data, err := service.GetCouponSrv().GetMyCouponListByStatus(userInfo.Id, enum.CouponStatus(status))
 	if err != nil {
 		api.Fail(c, enum.ResCodeFail, err.Error())
 		return
@@ -40,7 +40,8 @@ func (api DiscountsApi) Coupons(c *gin.Context) {
 func (api DiscountsApi) Fetch(c *gin.Context) {
 	//@todo 领取优惠券
 	userInfo := api.GetUserInfo(c)
-	id := cast.ToInt64(c.Query("id"))
+	id_, _ := c.GetPostForm("id")
+	id := cast.ToInt64(id_)
 	err := service.GetCouponSrv().FetchCoupon(c, userInfo, id)
 	api.Res(c, "success", err)
 	//api.Fail(c, 30001, "user score is not enough") //积分不足

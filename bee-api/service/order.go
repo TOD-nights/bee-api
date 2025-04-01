@@ -85,8 +85,8 @@ func (s *OrderSrv) Close(c context.Context, orderId int64, remark string) error 
 			})
 			if len(couponIds) > 0 {
 				if err := tx.Model(&model.BeeOrderCoupon{}).Where("coupon_id in ? and uid = ? and is_deleted = 0", couponIds, kit.GetUid(c)).Updates(map[string]interface{}{
-					"status":      enum.OrderStatusClose,
-					"date_update": time.Now(),
+					"is_deleted":  1,
+					"date_delete": time.Now(),
 				}).Error; err != nil {
 					return err
 				}
