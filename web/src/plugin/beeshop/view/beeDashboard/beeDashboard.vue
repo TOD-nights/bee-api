@@ -1,4 +1,6 @@
 <template>
+
+  
   <div
     class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 py-2 gap-4 md:gap-2 gva-container2"
   >
@@ -58,6 +60,13 @@
     </gva-card>
 
 
+<!-- 添加今日流水卡片 -->
+<gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
+    >
+      <gva-chart :data="[todayAmount]" title="今日流水" />
+    </gva-card>
 
     
     <gva-card
@@ -167,7 +176,31 @@ const pageNum = ref(0);
 const pageSize = ref(10);
 const dates = ref([]);
 const shopId = ref("");
+
+// 添加今日流水相关的数据
+const todayAmount = ref(0);
+
+// 在 init 函数中添加获取今日流水的逻辑
+const getTodayAmount = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+  const todayPayment = await getBeePayTotal({
+    page: 1,
+    pageSize: 1,
+    startDateAdd: today,
+    endDateAdd: tonight,
+    sum: "money"
+  });
+
+  if (todayPayment.code === 0) {
+    todayAmount.value = todayPayment.data.total || 0;
+  }
+};
+
 const init = async () => {
+  await getTodayAmount(); // 添加这一行
+
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   for (let i = 7; i >= 0; i--) {
     // 获取最近7天数据
@@ -221,7 +254,6 @@ const init = async () => {
       })
     );
     const results = await Promise.all(funcs);
-
     const userTable = results[0];
     if (userTable.code === 0) {
       userData.value.push(userTable.data.total);
