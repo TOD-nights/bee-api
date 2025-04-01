@@ -69,6 +69,15 @@
     </gva-card>
 
     
+    <!-- 添加今日订单数卡片 -->
+<gva-card
+      custom-class="col-span-1 lg:col-span-2 h-32"
+      @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
+    >
+      <gva-chart :data="[todayOrderCount]" title="今日订单数" />
+</gva-card>
+
+    
     <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
       @click="gotoPage('/bee_index/shop-user-admin/beeUser')"
@@ -179,6 +188,8 @@ const shopId = ref("");
 
 // 添加今日流水相关的数据
 const todayAmount = ref(0);
+// 添加今日订单数相关的数据
+const todayOrderCount = ref(0);
 
 // 在 init 函数中添加获取今日流水的逻辑
 const getTodayAmount = async () => {
@@ -198,8 +209,27 @@ const getTodayAmount = async () => {
   }
 };
 
+
+// 获取今日订单数的方法
+const getTodayOrderCount = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+  const todayOrders = await getBeeOrderList({
+    page: 1,
+    pageSize: 1,
+    startDateAdd: today,
+    endDateAdd: tonight
+  });
+
+  if (todayOrders.code === 0) {
+    todayOrderCount.value = todayOrders.data.total || 0;
+  }
+};
+
 const init = async () => {
   await getTodayAmount(); // 初始化时获取今日流水
+  await getTodayOrderCount(); // 获取今日订单数
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   for (let i = 7; i >= 0; i--) {
