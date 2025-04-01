@@ -365,7 +365,31 @@ const getTodayBalanceLog = async () => {
     startDateAdd: today,
     endDateAdd: tonight
   });
+// 分别获取充值和支付记录
+const rechargeLog = await getBeeUserBalanceLogList({
+    page: 1,
+    pageSize: 1000,
+    startDateAdd: today,
+    endDateAdd: tonight,
+    type: 'recharge'  // 获取充值记录
+  });
 
+  const paymentLog = await getBeeUserBalanceLogList({
+    page: 1,
+    pageSize: 1000,
+    startDateAdd: today,
+    endDateAdd: tonight,
+    type: 'payment'  // 获取支付记录
+  });
+
+  if (rechargeLog.code === 0) {
+    todayRechargeTotal.value = rechargeLog.data.list.reduce((sum, item) => sum + Number(item.num), 0);
+  }
+
+  if (paymentLog.code === 0) {
+    todayPaymentTotal.value = Math.abs(paymentLog.data.list.reduce((sum, item) => sum + Number(item.num), 0));
+  }
+  
   if (balanceLog.code === 0) {
     // 分别计算充值和支付金额
     const rechargeList = balanceLog.data.list.filter(item => item.mark === '充值');
@@ -387,6 +411,7 @@ const getTodayBalanceLogSelect = async () => {
     startDateAdd: today,
     endDateAdd: tonight,
     shopId: shopId.value
+    
   });
 
 

@@ -83,10 +83,21 @@ func (beeUserBalanceLogService *BeeUserBalanceLogService) GetBeeUserBalanceLogIn
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
+	// 修改查询逻辑，使用 LEFT JOIN 而不是 INNER JOIN
 	db := GetBeeDB().Debug().Table(bee.BeeUserBalanceLog{}.TableName() + " as log ").
-		Joins("inner join bee_order a on concat('pay',a.order_number) = log.order_id").
-		Joins(" inner join bee_shop_info b on a.shop_id = b.id")
-	db = db.Where("log.user_id = ?", shopUserId).Where("a.is_pay = ?", 1)
+		Joins("left join bee_order a on concat('pay',a.order_number) = log.order_id").
+		Joins("left join bee_shop_info b on a.shop_id = b.id")
+
+	// 基础条件
+	db = db.Where("log.user_id = ?", shopUserId)
+
+	// 根据 type 参数过滤记录
+	if info.Type == "payment" {
+		db = db.Where("log.mark = ?", "订单支付")
+	} else if info.Type == "recharge" {
+		db = db.Where("log.mark = ?", "充值")
+	}
+
 	if len(shopIds) > 0 {
 		db = db.Where("a.shop_id in ?", shopIds)
 	} else {
@@ -120,7 +131,7 @@ func (beeUserBalanceLogService *BeeUserBalanceLogService) GetBeeUserBalanceLogIn
 		db = db.Order(OrderStr)
 	}
 	if limit != 0 {
-		db = db.Limit(limit).Offset(offset).Select("log.*,b.name as shopName,a.amount as amount")
+		db = db.Limit(limit).Offset(offset).Select("log.*,b.name as shopName,COALESCE(a.amount, log.num) as amount")
 	}
 
 	err = db.Find(&beeUserBalanceLogs).Error
