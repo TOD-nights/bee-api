@@ -116,6 +116,40 @@
   <gva-chart :data="[todayOrderCountSelect]" title="今日选择商店订单数" />
 </gva-card>
 
+
+
+<!-- 添加今日充值卡片 -->
+<gva-card
+  custom-class="col-span-1 lg:col-span-2 h-32"
+  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
+>
+  <gva-chart :data="[todayRechargeTotal]" title="今日全部商店充值金额" />
+</gva-card>
+
+<!-- 添加今日支付卡片 -->
+<gva-card
+  custom-class="col-span-1 lg:col-span-2 h-32"
+  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
+>
+  <gva-chart :data="[todayPaymentTotal]" title="今日全部商店支付金额" />
+</gva-card>
+
+<!-- 添加选中商店今日充值卡片 -->
+<gva-card
+  custom-class="col-span-1 lg:col-span-2 h-32"
+  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
+>
+  <gva-chart :data="[todayRechargeSelect]" title="今日选择商店充值金额" />
+</gva-card>
+
+<!-- 添加选中商店今日支付卡片 -->
+<gva-card
+  custom-class="col-span-1 lg:col-span-2 h-32"
+  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
+>
+  <gva-chart :data="[todayPaymentSelect]" title="今日选择商店支付金额" />
+</gva-card>
+
     <!--
     <gva-card
       custom-class="col-span-1 lg:col-span-2 h-32"
@@ -202,6 +236,7 @@ import {
   getBeePayLogList,
   getBeePayTotal,
 } from "@/plugin/beeshop/api/beePayLog";
+import { getBeeUserBalanceLogList } from "@/plugin/beeshop/api/beeUserBalanceLog";
 import { getBeeOrderList, orderList } from "@/plugin/beeshop/api/beeOrder";
 import { getBeeShopGoodsList } from "@/plugin/beeshop/api/beeShopGoods";
 import { formatDate, formatEnum, getDictFunc } from "@/utils/format";
@@ -226,6 +261,13 @@ const pageNum = ref(0);
 const pageSize = ref(10);
 const dates = ref([]);
 const shopId = ref("");
+
+// 添加新的变量来分别存储充值和支付数据
+const todayRechargeTotal = ref(0);    // 今日充值总额
+const todayPaymentTotal = ref(0);     // 今日支付总额
+const todayRechargeSelect = ref(0);   // 选中商店今日充值总额
+const todayPaymentSelect = ref(0);    // 选中商店今日支付总额
+
 
 // 添加今日流水相关的数据
 const todayAmount = ref(0);
@@ -293,16 +335,6 @@ const getTodayOrderCountSelect = async () => {
   }
 };
 
-// 修改 watch 监听器
-watch(shopId, async (newVal) => {
-  if (newVal) {  // 只有当有选择值时才调用
-    await getTodayAmountSelect();
-    await getTodayOrderCountSelect();
-  } else {
-    todayAmountSelect.value = 0; // 没有选择时清零
-    todayOrderCountSelect.value = 0;
-  }
-}, { immediate: true });  // 添加 immediate: true 确保初始化时也会触发
 
 // 获取今日订单数的方法
 const getTodayOrderCount = async () => {
@@ -321,11 +353,97 @@ const getTodayOrderCount = async () => {
   }
 };
 
+
+// 获取今日余额变动数据，区分充值和支付
+const getTodayBalanceLog = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+  const balanceLog = await getBeeUserBalanceLogList({
+    page: 1,
+    pageSize: 1000,
+    startDateAdd: today,
+    endDateAdd: tonight
+  });
+
+  if (balanceLog.code === 0) {
+    // 分别计算充值和支付金额
+    const rechargeList = balanceLog.data.list.filter(item => item.mark === '充值');
+    const paymentList = balanceLog.data.list.filter(item => item.mark === '订单支付');
+    
+    todayRechargeTotal.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
+    todayPaymentTotal.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
+  }
+};
+// 获取选中商店的余额变动数据，区分充值和支付
+const getTodayBalanceLogSelect = async () => {
+  const today = dayjs().startOf('day').toDate();
+  const tonight = dayjs().endOf('day').toDate();
+  
+   // 打印 API 请求参数
+   console.log('API 请求参数:', {
+    page: 1,
+    pageSize: 1000,
+    startDateAdd: today,
+    endDateAdd: tonight,
+    shopId: shopId.value
+  });
+
+
+  const balanceLog = await getBeeUserBalanceLogList({
+    page: 1,
+    pageSize: 1000,
+    startDateAdd: today,
+    endDateAdd: tonight,
+    shopId: shopId.value
+  });
+  console.log('API 返回的完整响应:', balanceLog); // 查看完整响应
+  console.log('余额变动数据:', balanceLog.data.list);
+  
+  if (balanceLog.code === 0) {
+      // 检查所有不同类型的 mark
+      const uniqueMarks = [...new Set(balanceLog.data.list.map(item => item.mark))];
+    console.log('所有 mark 类型:', uniqueMarks);
+
+    const rechargeList = balanceLog.data.list.filter(item => item.mark === '充值');
+    const paymentList = balanceLog.data.list.filter(item => item.mark === '订单支付');
+    
+    console.log('充值记录:', rechargeList);
+    console.log('支付记录:', paymentList);
+
+    
+   
+    todayRechargeSelect.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
+    todayPaymentSelect.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
+
+    console.log('计算后的充值金额:', todayRechargeSelect.value);
+    console.log('计算后的支付金额:', todayPaymentSelect.value);
+  }
+};
+
+// 修改 watch 监听器
+watch(shopId, async (newVal) => {
+  if (newVal) {  // 只有当有选择值时才调用
+    await getTodayAmountSelect();
+    await getTodayOrderCountSelect();
+    await getTodayBalanceLogSelect();
+  } else {
+    todayAmountSelect.value = 0; // 没有选择时清零
+    todayOrderCountSelect.value = 0;
+    todayRechargeSelect.value = 0;   // 使用新的变量
+    todayPaymentSelect.value = 0;     // 使用新的变
+  }
+}, { immediate: true });  // 添加 immediate: true 确保初始化时也会触发
+
+
+
 const init = async () => {
   await getTodayAmount(); // 初始化时获取今日流水
   await getTodayAmountSelect(); // 初始化时获取今日选择商店流水
   await getTodayOrderCount(); // 获取今日订单数
   await getTodayOrderCountSelect();
+  await getTodayBalanceLog();
+  await getTodayBalanceLogSelect();
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   for (let i = 7; i >= 0; i--) {
