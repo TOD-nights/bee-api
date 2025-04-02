@@ -236,7 +236,7 @@ import {
   getBeePayLogList,
   getBeePayTotal,
 } from "@/plugin/beeshop/api/beePayLog";
-import { getBeeUserBalanceLogList } from "@/plugin/beeshop/api/beeUserBalanceLog";
+import { getBeeUserBalanceLogList,getBeeUserBalanceLogCount } from "@/plugin/beeshop/api/beeUserBalanceLog";
 import { getBeeOrderList, orderList } from "@/plugin/beeshop/api/beeOrder";
 import { getBeeShopGoodsList } from "@/plugin/beeshop/api/beeShopGoods";
 import { formatDate, formatEnum, getDictFunc } from "@/utils/format";
@@ -366,13 +366,24 @@ const getTodayBalanceLog = async () => {
     endDateAdd: tonight
   });
 // 分别获取充值和支付记录
-const rechargeLog = await getBeeUserBalanceLogList({
+const rechargeLog = await getBeeUserBalanceLogCount({
     page: 1,
     pageSize: 1000,
     startDateAdd: today,
     endDateAdd: tonight,
     type: 'recharge'  // 获取充值记录
   });
+
+  getBeeUserBalanceLogCount({
+    startDateAdd: today,
+    endDateAdd: tonight,
+    type: 'recharge',  // 获取充值记录
+    shopId: shopId.value
+  }).then(res=>{
+    if(res.code == 200){
+      todayRechargeSelect.value = res.data
+    }
+  })
 
   const paymentLog = await getBeeUserBalanceLogList({
     page: 1,
@@ -383,7 +394,7 @@ const rechargeLog = await getBeeUserBalanceLogList({
   });
 
   if (rechargeLog.code === 0) {
-    todayRechargeTotal.value = rechargeLog.data.list.reduce((sum, item) => sum + Number(item.num), 0);
+    todayRechargeTotal.value = rechargeLog.data;
   }
 
   if (paymentLog.code === 0) {
@@ -438,7 +449,7 @@ const getTodayBalanceLogSelect = async () => {
 
     
    
-    todayRechargeSelect.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
+    // todayRechargeSelect.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
     todayPaymentSelect.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
 
     console.log('计算后的充值金额:', todayRechargeSelect.value);

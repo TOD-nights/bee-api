@@ -59,6 +59,7 @@ router.beforeEach(async(to, from) => {
         if (router.hasRoute(userStore.userInfo.authority.defaultRouter)) {
           return { name: userStore.userInfo.authority.defaultRouter }
         } else {
+          console.log(userStore.userInfo.authorities)
           return { path: '/layout/404' }
         }
       } else {
@@ -89,6 +90,8 @@ router.beforeEach(async(to, from) => {
           if (router.hasRoute(userStore.userInfo.authority.defaultRouter)) {
             return { ...to, replace: true }
           } else {
+            console.log(userStore.userInfo.authorities)
+            console.log(userStore.userInfo.authority)
             return { path: '/layout/404' }
           }
         } else {

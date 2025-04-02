@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"strconv"
 	"strings"
 
@@ -24,13 +25,19 @@ func CasbinHandler() gin.HandlerFunc {
 		act := c.Request.Method
 		// 获取用户的角色
 		sub := strconv.Itoa(int(waitUse.AuthorityId))
-		e := casbinService.Casbin() // 判断策略中是否存在
-		success, _ := e.Enforce(sub, obj, act)
-		if !success {
-			response.FailWithDetailed(gin.H{}, "权限不足", c)
-			c.Abort()
-			return
+		var authority system.SysAuthority
+		global.GVA_DB.Model(&system.SysAuthority{}).First(&authority, sub)
+		if authority.Admin == 1 {
+			c.Next()
+		} else {
+			e := casbinService.Casbin() // 判断策略中是否存在
+			success, _ := e.Enforce(sub, obj, act)
+			if !success {
+				response.FailWithDetailed(gin.H{}, "权限不足", c)
+				c.Abort()
+				return
+			}
+			c.Next()
 		}
-		c.Next()
 	}
 }

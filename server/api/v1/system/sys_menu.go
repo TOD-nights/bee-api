@@ -24,16 +24,44 @@ type AuthorityMenuApi struct{}
 // @Success   200   {object}  response.Response{data=systemRes.SysMenusResponse,msg=string}  "获取用户动态路由,返回包括系统菜单详情列表"
 // @Router    /menu/getMenu [post]
 func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
-	menus, err := menuService.GetMenuTree(utils.GetUserAuthorityId(c))
-	if err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
-		response.FailWithMessage("获取失败", c)
+	var sysUser system.SysUser
+	var userId = utils.GetUserID(c)
+
+	if err := global.GVA_DB.Model(&system.SysUser{}).Preload("Authorities").First(&sysUser, userId).Error; err != nil {
 		return
 	}
-	if menus == nil {
-		menus = []system.SysMenu{}
+	var admin = false
+	for _, role := range sysUser.Authorities {
+		if role.Admin == 1 {
+			admin = true
+			break
+		}
 	}
-	response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
+	if admin {
+		menus, err := menuService.GetMenuTree(0)
+		if err != nil {
+			global.GVA_LOG.Error("获取失败!", zap.Error(err))
+			response.FailWithMessage("获取失败", c)
+			return
+		}
+		if menus == nil {
+			menus = []system.SysMenu{}
+		}
+		response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
+
+	} else {
+		menus, err := menuService.GetMenuTree(utils.GetUserAuthorityId(c))
+		if err != nil {
+			global.GVA_LOG.Error("获取失败!", zap.Error(err))
+			response.FailWithMessage("获取失败", c)
+			return
+		}
+		if menus == nil {
+			menus = []system.SysMenu{}
+		}
+		response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
+	}
+
 }
 
 // GetBaseMenuTree
