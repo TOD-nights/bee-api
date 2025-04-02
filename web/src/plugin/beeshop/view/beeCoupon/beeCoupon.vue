@@ -45,6 +45,7 @@
         <el-table-column align="left" label="满xx可用" prop="moneyHreshold" width="120" />
         <el-table-column align="left" label="优惠券最大金额" prop="moneyMax" width="120" />
         <el-table-column align="left" label="优惠券最小金额" prop="moneyMin" width="120" />
+        <el-table-column align="left" label="优惠券面值/折扣比例" prop="money" width="120" />
         <el-table-column align="left" label="类型，0固定优惠，1比例折扣" prop="moneyType" width="120" />
         <el-table-column align="left" label="优惠券名字" prop="name" width="120" />
 <!--        <el-table-column align="left" label="购买需要金额" prop="needAmount" width="120" />-->
@@ -163,6 +164,9 @@
             <el-form-item label="优惠券最小金额:"  prop="moneyMin" >
               <el-input-number v-model="formData.moneyMin"  style="width:100%" :precision="2" :clearable="true"  />
             </el-form-item>
+            <el-form-item label="优惠券面值/折扣比例:"  prop="money" >
+              <el-input-number v-model="formData.money"  style="width:100%" :precision="2" :clearable="true"  />
+            </el-form-item>
             <el-form-item label="类型，0固定优惠，1折扣:"  prop="moneyType" >
               <el-input v-model.number="formData.moneyType" :clearable="true" placeholder="请输入类型，0固定优惠，1折扣" />
             </el-form-item>
@@ -261,6 +265,7 @@ const formData = ref({
         moneyHreshold: 0,
         moneyMax: 0,
         moneyMin: 0,
+        money: 0,
         moneyType: undefined,
         name: '',
         needAmount: 0,
@@ -499,6 +504,7 @@ const closeDialog = () => {
         moneyHreshold: 0,
         moneyMax: 0,
         moneyMin: 0,
+        money: 0,
         moneyType: undefined,
         name: '',
         needAmount: 0,

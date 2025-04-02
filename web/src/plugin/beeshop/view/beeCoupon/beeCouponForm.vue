@@ -50,7 +50,10 @@
         <el-form-item label="优惠券最小金额:" prop="moneyMin">
           <el-input-number v-model="formData.moneyMin" :precision="2" :clearable="true"></el-input-number>
        </el-form-item>
-        <el-form-item label="类型，0固定优惠，1折扣:" prop="moneyType">
+        <el-form-item label="优惠券面值/折扣比例:" prop="money">
+          <el-input-number v-model="formData.money" :precision="2" :clearable="true"></el-input-number>
+        </el-form-item>
+        <el-form-item label="类型，0固定优惠，1折扣" prop="moneyType">
           <el-input v-model.number="formData.moneyType" :clearable="true" placeholder="请输入" />
        </el-form-item>
         <el-form-item label="优惠券名字:" prop="name">
@@ -151,6 +154,7 @@ const formData = ref({
             moneyHreshold: 0,
             moneyMax: 0,
             moneyMin: 0,
+            money: 0,
             moneyType: undefined,
             name: '',
             needAmount: 0,

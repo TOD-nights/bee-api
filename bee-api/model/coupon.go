@@ -66,6 +66,7 @@ type BeeCoupon struct {
 	MoneyHreshold        decimal.Decimal        `gorm:"column:money_hreshold;type:decimal(20,2);comment:满xx可用" json:"moneyHreshold"`
 	MoneyMax             decimal.Decimal        `gorm:"column:money_max;type:decimal(20,2);comment:优惠券最大金额" json:"moneyMax"`
 	MoneyMin             decimal.Decimal        `gorm:"column:money_min;type:decimal(20,2);comment:优惠券最小金额" json:"moneyMin"`
+	Money                decimal.Decimal        `gorm:"column:money;type:decimal(20,2);comment:优惠券金额/优惠券折扣系数" json:"money"`
 	MoneyType            enum.CouponMoneyType   `gorm:"column:money_type;type:bigint(11);comment:类型，1满xx，2折扣" json:"moneyType"`
 	Name                 string                 `gorm:"column:name;type:varchar(100);comment:优惠券名字" json:"name"`
 	NeedAmount           decimal.Decimal        `gorm:"column:need_amount;type:decimal(20,2);comment:需要支付" json:"needAmount"`
