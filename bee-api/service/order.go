@@ -6,6 +6,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
+	"strings"
+	"sync"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/common"
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
@@ -23,10 +28,6 @@ import (
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"math"
-	"strings"
-	"sync"
-	"time"
 )
 
 type OrderSrv struct {
@@ -282,10 +283,10 @@ func (s *OrderSrv) CreateOrder(c context.Context, ip string, req *proto.CreateOr
 
 	if needPeisong {
 		if shopInfo.Number == "" {
-			return nil, errors.New("请先设置商店的快递门店编号")
+			return nil, errors.New("请注意选择正确的门店")
 		}
 		if shopInfo.ExpressType == "" {
-			return nil, errors.New("请先设置商店的生鲜配送类型")
+			return nil, errors.New("请注意选择正确的门店")
 		}
 
 		// 配送是直接使用传过来的地址
