@@ -41,6 +41,9 @@
         <el-form-item label="优惠券面额范围:" prop="moneyMax">
           <el-input v-model.number="formData.moneyMax" :clearable="true" placeholder="请输入" />
        </el-form-item>
+        <el-form-item label="优惠券面额/折扣系数" prop="money">
+          <el-input v-model.number="formData.money" :clearable="true" placeholder="请输入" />
+        </el-form-item>
         <el-form-item label="优惠券类型:" prop="moneyType">
           <el-input v-model.number="formData.moneyType" :clearable="true" placeholder="请输入" />
        </el-form-item>

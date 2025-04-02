@@ -182,7 +182,7 @@ func (srv *CouponSrv) FetchCoupon(c context.Context, userInfo *model.BeeUser, id
 			Uid:           userInfo.Id,
 			DateStart:     dateStart,
 			ExpiryMillis:  expireMills,
-			Money:         coupon.MoneyMin,
+			Money:         coupon.Money,
 			MoneyHreshold: coupon.MoneyHreshold,
 			MoneyMin:      coupon.MoneyMin,
 			MoneyMax:      coupon.MoneyMax,

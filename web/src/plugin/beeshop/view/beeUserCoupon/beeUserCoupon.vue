@@ -57,7 +57,7 @@
             <template #default="scope">{{ formatDate(scope.row.dateStart) }}</template>
          </el-table-column>
         <el-table-column align="left" label="过期时间（毫秒）" prop="expiryMillis" width="120" />
-        <el-table-column align="left" label="金额" prop="money" width="120" />
+        <el-table-column align="left" label="金额/折扣比例" prop="money" width="120" />
         <el-table-column align="left" label="满xx可用" prop="moneyHreshold" width="120" />
         <el-table-column align="left" label="优惠券面额范围" prop="moneyMin" width="120" />
         <el-table-column align="left" label="优惠券面额范围" prop="moneyMax" width="120" />
@@ -148,6 +148,9 @@
             </el-form-item>
             <el-form-item label="优惠券面额范围:"  prop="moneyMax" >
               <el-input v-model.number="formData.moneyMax" :clearable="true" placeholder="请输入优惠券面额范围" />
+            </el-form-item>
+            <el-form-item label="优惠券面值/折扣比例"  prop="money" >
+              <el-input v-model.number="formData.money" :clearable="true" placeholder="请输入优惠券面额范围" />
             </el-form-item>
             <el-form-item label="优惠券类型:"  prop="moneyType" >
               <el-input v-model.number="formData.moneyType" :clearable="true" placeholder="请输入优惠券类型" />
