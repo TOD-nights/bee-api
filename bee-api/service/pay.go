@@ -295,7 +295,7 @@ func (fee *PaySrv) GetWechatPayClient(ctx context.Context, cfg *WxPayConfig) (*w
 	return wechatClient, nil
 }
 
-func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, remark string, nextAction string, name string) (*proto.GetWxPayInfoRes, error) {
+func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, remark string, nextAction string, name string, shopId int64) (*proto.GetWxPayInfoRes, error) {
 	// 获取配置
 	type payAction struct {
 		Type int32 `json:"type"`
@@ -377,6 +377,7 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		OrderNo:     payOrderId,
 		PayGate:     enum.PayGateWXAPP,
 		Remark:      "",
+		ShopId:      shopId,
 		Status:      enum.PayLogStatusUnPaid,
 		Uid:         kit.GetUid(c),
 		OrderNumber: outTradeNo,

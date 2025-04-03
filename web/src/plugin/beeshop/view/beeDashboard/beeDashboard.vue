@@ -394,7 +394,9 @@ const rechargeLog = await getBeeUserBalanceLogCount({
   });
 
   if (rechargeLog.code === 0) {
-    todayRechargeTotal.value = rechargeLog.data;
+    console.log(rechargeLog,rechargeLog.data.data)
+
+    todayRechargeTotal.value = rechargeLog.data.data;
   }
 
   if (paymentLog.code === 0) {
@@ -406,8 +408,8 @@ const rechargeLog = await getBeeUserBalanceLogCount({
     const rechargeList = balanceLog.data.list.filter(item => item.mark === '充值');
     const paymentList = balanceLog.data.list.filter(item => item.mark === '订单支付');
     
-    todayRechargeTotal.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
-    todayPaymentTotal.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
+    // todayRechargeTotal.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
+    // todayPaymentTotal.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
   }
 };
 // 获取选中商店的余额变动数据，区分充值和支付
@@ -573,7 +575,7 @@ const init = async () => {
   }
 };
 const spanMethodHandler = (row, column, rowIndex, columnIndex) => {
-  console.log(row, column, rowIndex, columnIndex);
+  // console.log(row, column, rowIndex, columnIndex);
   // if(row - 1 == rowIndex && columnIndex == 0){
   //   return [1,2]
   // }else {

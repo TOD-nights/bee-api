@@ -16,14 +16,14 @@ type BeeShopInfoService struct{}
 func (beeShopInfoService *BeeShopInfoService) CreateBeeShopInfo(beeShopInfo *bee.BeeShopInfo) (err error) {
 	beeShopInfo.DateAdd = utils.NowPtr()
 	beeShopInfo.DateUpdate = utils.NowPtr()
-	err = GetBeeDB().Create(beeShopInfo).Error
+	err = global.GVA_DB.Create(beeShopInfo).Error
 	return err
 }
 
 // DeleteBeeShopInfo 删除商店信息记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (beeShopInfoService *BeeShopInfoService) DeleteBeeShopInfo(id string, shopUserId int) (err error) {
-	err = GetBeeDB().Model(&bee.BeeShopInfo{}).Where("id = ?", id).Where("user_id = ?", shopUserId).
+	err = global.GVA_DB.Model(&bee.BeeShopInfo{}).Where("id = ?", id).Where("user_id = ?", shopUserId).
 		Updates(map[string]interface{}{
 			"is_deleted":  1,
 			"date_delete": utils.NowPtr(),
@@ -34,7 +34,7 @@ func (beeShopInfoService *BeeShopInfoService) DeleteBeeShopInfo(id string, shopU
 // DeleteBeeShopInfoByIds 批量删除商店信息记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (beeShopInfoService *BeeShopInfoService) DeleteBeeShopInfoByIds(ids []string, shopUserId int) (err error) {
-	err = GetBeeDB().Model(&bee.BeeShopInfo{}).Where("id = ?", ids).Where("user_id = ?", shopUserId).
+	err = global.GVA_DB.Model(&bee.BeeShopInfo{}).Where("id = ?", ids).Where("user_id = ?", shopUserId).
 		Updates(map[string]interface{}{
 			"is_deleted":  1,
 			"date_delete": utils.NowPtr(),
@@ -46,14 +46,14 @@ func (beeShopInfoService *BeeShopInfoService) DeleteBeeShopInfoByIds(ids []strin
 // Author [piexlmax](https://github.com/piexlmax)
 func (beeShopInfoService *BeeShopInfoService) UpdateBeeShopInfo(beeShopInfo bee.BeeShopInfo, shopUserId int) (err error) {
 	beeShopInfo.DateUpdate = utils.NowPtr()
-	err = GetBeeDB().Model(&bee.BeeShopInfo{}).Where("id = ? and user_id = ?", beeShopInfo.Id, shopUserId).Updates(&beeShopInfo).Error
+	err = global.GVA_DB.Model(&bee.BeeShopInfo{}).Where("id = ? and user_id = ?", beeShopInfo.Id, shopUserId).Updates(&beeShopInfo).Error
 	return err
 }
 
 // GetBeeShopInfo 根据id获取商店信息记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (beeShopInfoService *BeeShopInfoService) GetBeeShopInfo(id string, shopUserId int) (beeShopInfo bee.BeeShopInfo, err error) {
-	err = GetBeeDB().Where("id = ? and user_id = ?", id, shopUserId).First(&beeShopInfo).Error
+	err = global.GVA_DB.Where("id = ? and user_id = ?", id, shopUserId).First(&beeShopInfo).Error
 	return
 }
 
@@ -66,7 +66,7 @@ func (beeShopInfoService *BeeShopInfoService) GetBeeShopInfoInfoList(info beeReq
 	var shopIds = []int{}
 	if loginUserId > 0 {
 		var userInfo system.SysUser
-		GetBeeDB().Model(&userInfo).Preload("Authorities").First(&userInfo, loginUserId)
+		global.GVA_DB.Model(&userInfo).Preload("Authorities").First(&userInfo, loginUserId)
 		roleIds := []uint{}
 		for _, role := range userInfo.Authorities {
 			roleIds = append(roleIds, role.AuthorityId)
@@ -87,7 +87,7 @@ func (beeShopInfoService *BeeShopInfoService) GetBeeShopInfoInfoList(info beeReq
 	}
 
 	// 创建db
-	db := GetBeeDB().Model(&bee.BeeShopInfo{})
+	db := global.GVA_DB.Model(&bee.BeeShopInfo{})
 	// db = db.Where("user_id = ?", shopUserId)
 	if len(shopIds) > 0 {
 		db = db.Where("id in ?", shopIds)
@@ -109,7 +109,7 @@ func (beeShopInfoService *BeeShopInfoService) GetBeeShopInfoInfoList(info beeReq
 
 func (service *BeeShopInfoService) GetAllBeeShopInfos() ([]model.BeeShopInfo, error) {
 	var list []model.BeeShopInfo
-	if err := GetBeeDB().Debug().Model(&model.BeeShopInfo{}).Order("id desc").Find(&list).Error; err != nil {
+	if err := global.GVA_DB.Debug().Model(&model.BeeShopInfo{}).Order("id desc").Find(&list).Error; err != nil {
 		return list, err
 	} else {
 		return list, nil
