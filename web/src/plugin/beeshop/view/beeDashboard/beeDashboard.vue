@@ -175,7 +175,7 @@ v-if="isAdmin"
 
 
 
-<!-- 添加选中商店今日充值卡片-->
+<!-- 添加选中商店今日充值卡片
 
 
 <el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
@@ -190,7 +190,7 @@ v-if="isAdmin"
       <span class="text-sm">元</span>
     </template>
   </el-statistic>
-</el-card>
+</el-card>-->
 
 
 
@@ -217,7 +217,8 @@ v-if="isAdmin"
 
 
 
-<!-- 添加选中商店今日支付卡片 
+<!-- 添加选中商店今日支付卡片 -->
+
 
 
 <el-card @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
@@ -232,8 +233,7 @@ v-if="isAdmin"
       <span class="text-sm">元</span>
     </template>
   </el-statistic>
-</el-card>-->
-
+</el-card>
 
 
     <!--
