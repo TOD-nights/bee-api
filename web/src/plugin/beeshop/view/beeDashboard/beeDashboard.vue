@@ -84,71 +84,151 @@
 
 <!-- 添加今日流水卡片 -->
  <!-- 全部商店-->
-<gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
-    >
-      <gva-chart :data="[todayAmount]" title="今日全部商店充值和消费金额" />
-    </gva-card>
+ <el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
+  <el-statistic 
+    :value="todayAmount" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日全部商店充值和消费金额</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">元</span>
+    </template>
+  </el-statistic>
+</el-card>
 
 <!-- 单个商店-->
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
-    >
-      <gva-chart :data="[todayAmountSelect]" title="今日选择商店充值和消费金额" />
-    </gva-card>
+    <el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
+  <el-statistic 
+    :value="todayAmountSelect" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日选中商店充值和消费金额</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">元</span>
+    </template>
+  </el-statistic>
+</el-card>
+
 
     
     <!-- 添加今日订单数卡片 -->
-<gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
-    >
-      <gva-chart :data="[todayOrderCount]" title="今日全部商店订单数" />
-</gva-card>
+
+
+    <el-card @click="gotoPage('/bee_index/shop-order-admin/beeOrder')">
+  <el-statistic 
+    :value="todayOrderCount" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日全部商店订单数</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">张</span>
+    </template>
+  </el-statistic>
+</el-card>
+
 
 <!-- 添加选中商店今日订单数卡片 -->
-<gva-card
-  custom-class="col-span-1 lg:col-span-2 h-32"
-  @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
->
-  <gva-chart :data="[todayOrderCountSelect]" title="今日选择商店订单数" />
-</gva-card>
+
+<el-card @click="gotoPage('/bee_index/shop-order-admin/beeOrder')">
+  <el-statistic 
+    :value="todayOrderCountSelect" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日选择商店订单数</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">张</span>
+    </template>
+  </el-statistic>
+</el-card>
 
 
 
 <!-- 添加今日充值卡片 -->
-<gva-card
-  custom-class="col-span-1 lg:col-span-2 h-32"
-  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
->
-  <gva-chart :data="[todayRechargeTotal]" title="今日全部商店充值金额" />
-</gva-card>
 
-<!-- 添加今日支付卡片 -->
-<gva-card
-  custom-class="col-span-1 lg:col-span-2 h-32"
-  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
->
-  <gva-chart :data="[todayPaymentTotal]" title="今日全部商店支付金额" />
-</gva-card>
+
+
+<el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
+  <el-statistic 
+    :value="todayRechargeTotal" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日全部商店充值金额</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">元</span>
+    </template>
+  </el-statistic>
+</el-card>
+
+
 
 <!-- 添加选中商店今日充值卡片 -->
-<gva-card
-  custom-class="col-span-1 lg:col-span-2 h-32"
-  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
->
-  <gva-chart :data="[todayRechargeSelect]" title="今日选择商店充值金额" />
-</gva-card>
+
+
+<el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
+  <el-statistic 
+    :value="todayRechargeSelect" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日选择商店充值金额</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">元</span>
+    </template>
+  </el-statistic>
+</el-card>
+
+
+
+
+
+<!-- 添加今日支付卡片 -->
+
+
+<el-card @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
+  <el-statistic 
+    :value="todayPaymentTotal" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日全部商店余额支付金额</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">元</span>
+    </template>
+  </el-statistic>
+</el-card>
+
+
 
 <!-- 添加选中商店今日支付卡片 -->
-<gva-card
-  custom-class="col-span-1 lg:col-span-2 h-32"
-  @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')"
->
-  <gva-chart :data="[todayPaymentSelect]" title="今日选择商店支付金额" />
-</gva-card>
+
+
+<el-card @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
+  <el-statistic 
+    :value="todayPaymentSelect" 
+    :precision="2"
+  >
+    <template #title>
+      <div class="font-bold">今日选择商店余额支付金额</div>
+    </template>
+    <template #suffix>
+      <span class="text-sm">元</span>
+    </template>
+  </el-statistic>
+</el-card>
+
+
 
     <!--
     <gva-card
@@ -200,7 +280,7 @@
         <el-table
           :data="orderTodo.list"
           stripe
-          style="width: 100%"
+          style="width: 100% ; height: 300px "
           @row-click="gotoTodoPage"
         >
           <el-table-column prop="orderNumber" label="订单号" width="200" />
