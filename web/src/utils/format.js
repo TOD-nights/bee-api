@@ -13,6 +13,7 @@ export const buildTreeMap = (tree, m) => {
 }
 
 export const formatEnum = (e, m) => {
+  if (!m || m.length == 0) return 'unknown'
   for (let i = 0; i < m.length; i++) {
     if (m[i].value == e) {
       return m[i].label

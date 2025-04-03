@@ -145,7 +145,7 @@ func (beeUserBalanceLogService *BeeUserBalanceLogService) GetBeeUserBalanceLogIn
 
 func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(info beeReq.BeeUserBalanceLogSearch, shopUserId int, currentUserId uint) (float64, error) {
 	var userInfo system.SysUser
-	GetBeeDB().Model(&userInfo).Preload("Authorities").First(&userInfo, currentUserId)
+	global.GVA_DB.Debug().Model(&userInfo).Preload("Authorities").First(&userInfo, currentUserId)
 
 	var adminFlag = false
 
@@ -178,7 +178,7 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(info beeReq.Bee
 		Joins("left join bee_shop_info b on a.shop_id = b.id")
 
 	// 基础条件
-	db = db.Where("log.user_id = ?", shopUserId)
+	//db = db.Where("log.user_id = ?", shopUserId)
 
 	// 根据 type 参数过滤记录
 	if info.Type == "payment" {

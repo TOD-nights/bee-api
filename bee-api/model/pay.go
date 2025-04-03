@@ -19,6 +19,7 @@ type BeePayLog struct {
 	Status       enum.PayLogStatus `gorm:"column:status;type:int(11);comment:状态" json:"status"`
 	StatusStr    string            `gorm:"-" json:"statusStr"`
 	Uid          int64             `gorm:"column:uid;type:bigint(11);comment:用户id" json:"uid"`
+	ShopId       int64             `gorm:"column:shop_id;type:bigint(11);comment:所属门店" json:"shopId"`
 }
 
 func (b *BeePayLog) TableName() string {

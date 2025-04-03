@@ -120,7 +120,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(info beeReq.BeePa
 // GetBeePayTotal 获取支付流水总数
 func (beePayLogService *BeePayLogService) GetBeePayTotal(info beeReq.BeePayLogSearch, shopUserId int) (total float64, err error) {
 	// 创建db
-	db := GetBeeDB().Model(&bee.BeePayLog{})
+	db := GetBeeDB().Debug().Model(&bee.BeePayLog{})
 	db = db.Where("user_id = ?", shopUserId)
 	if info.StartDateAdd != nil && info.EndDateAdd != nil {
 		db = db.Where("date_add BETWEEN ? AND ? ", info.StartDateAdd, info.EndDateAdd)
