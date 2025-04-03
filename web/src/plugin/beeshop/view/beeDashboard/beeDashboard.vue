@@ -52,7 +52,7 @@
   <el-table
     :data="orders"
     stripe
-    style="width: 100%"
+    style="width: 100%;height: 300px"
     :span-method="spanMethodHandler"
   >
     <!-- 在手机上隐藏订单号列 -->
@@ -121,7 +121,6 @@
     <el-card @click="gotoPage('/bee_index/shop-order-admin/beeOrder')">
   <el-statistic 
     :value="todayOrderCount" 
-    :precision="2"
   >
     <template #title>
       <div class="font-bold">今日全部商店订单数</div>
@@ -138,7 +137,6 @@
 <el-card @click="gotoPage('/bee_index/shop-order-admin/beeOrder')">
   <el-statistic 
     :value="todayOrderCountSelect" 
-    :precision="2"
   >
     <template #title>
       <div class="font-bold">今日选择商店订单数</div>
@@ -171,7 +169,7 @@
 
 
 
-<!-- 添加选中商店今日充值卡片 -->
+<!-- 添加选中商店今日充值卡片
 
 
 <el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
@@ -186,7 +184,7 @@
       <span class="text-sm">元</span>
     </template>
   </el-statistic>
-</el-card>
+</el-card>-->
 
 
 
