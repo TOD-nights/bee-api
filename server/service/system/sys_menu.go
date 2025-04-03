@@ -2,7 +2,6 @@ package system
 
 import (
 	"errors"
-
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
@@ -26,7 +25,12 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[ui
 	treeMap = make(map[uint][]system.SysMenu)
 
 	var SysAuthorityMenus []system.SysAuthorityMenu
-	err = global.GVA_DB.Where("sys_authority_authority_id = ?", authorityId).Find(&SysAuthorityMenus).Error
+	if authorityId == 0 {
+		err = global.GVA_DB.Find(&SysAuthorityMenus).Error
+		//fmt.Println(12)
+	} else {
+		err = global.GVA_DB.Where("sys_authority_authority_id = ?", authorityId).Find(&SysAuthorityMenus).Error
+	}
 	if err != nil {
 		return
 	}
@@ -51,7 +55,12 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[ui
 		})
 	}
 
-	err = global.GVA_DB.Where("authority_id = ?", authorityId).Preload("SysBaseMenuBtn").Find(&btns).Error
+	if authorityId == 0 {
+		err = global.GVA_DB.Preload("SysBaseMenuBtn").Find(&btns).Error
+	} else {
+		err = global.GVA_DB.Where("authority_id = ?", authorityId).Preload("SysBaseMenuBtn").Find(&btns).Error
+	}
+	//err = global.GVA_DB.Where("authority_id = ?", authorityId).Preload("SysBaseMenuBtn").Find(&btns).Error
 	if err != nil {
 		return
 	}
@@ -220,14 +229,38 @@ func (menuService *MenuService) GetMenuAuthority(info *request.GetAuthorityId) (
 //
 //	Author [SliverHorn](https://github.com/SliverHorn)
 func (menuService *MenuService) UserAuthorityDefaultRouter(user *system.SysUser) {
-	var menuIds []string
-	err := global.GVA_DB.Model(&system.SysAuthorityMenu{}).Where("sys_authority_authority_id = ?", user.AuthorityId).Pluck("sys_base_menu_id", &menuIds).Error
-	if err != nil {
-		return
+	var admin = false
+	if len(user.Authorities) > 0 {
+
+		for _, role := range user.Authorities {
+			if role.Admin == 1 {
+				admin = true
+				break
+			}
+		}
 	}
-	var am system.SysBaseMenu
-	err = global.GVA_DB.First(&am, "name = ? and id in (?)", user.Authority.DefaultRouter, menuIds).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		user.Authority.DefaultRouter = "404"
+
+	var menuIds []string
+	if !admin {
+
+		err := global.GVA_DB.Model(&system.SysAuthorityMenu{}).Where("sys_authority_authority_id = ?", user.AuthorityId).Pluck("sys_base_menu_id", &menuIds).Error
+		if err != nil {
+			return
+		}
+		var am system.SysBaseMenu
+		err = global.GVA_DB.First(&am, "name = ? and id in (?)", user.Authority.DefaultRouter, menuIds).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			user.Authority.DefaultRouter = "404"
+		}
+	} else {
+		err := global.GVA_DB.Model(&system.SysAuthorityMenu{}).Pluck("sys_base_menu_id", &menuIds).Error
+		if err != nil {
+			return
+		}
+		var am system.SysBaseMenu
+		err = global.GVA_DB.First(&am, "name = ? and id in (?)", user.Authority.DefaultRouter, menuIds).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			user.Authority.DefaultRouter = "404"
+		}
 	}
 }

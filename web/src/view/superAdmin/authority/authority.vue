@@ -3,129 +3,64 @@
     <warning-bar title="注：右上角头像下拉可切换角色" />
     <div class="gva-table-box">
       <div class="gva-btn-list">
-        <el-button type="primary" icon="plus" @click="addAuthority(0)"
-          >新增角色</el-button
-        >
-        <el-icon
-          class="cursor-pointer"
-          @click="
-            toDoc(
-              'https://www.bilibili.com/video/BV1kv4y1g7nT?p=8&vd_source=f2640257c21e3b547a790461ed94875e'
-            )
-          "
-          ><VideoCameraFilled
-        /></el-icon>
+        <el-button type="primary" icon="plus" @click="addAuthority(0)">新增角色</el-button>
+        <el-icon class="cursor-pointer" @click="
+          toDoc(
+            'https://www.bilibili.com/video/BV1kv4y1g7nT?p=8&vd_source=f2640257c21e3b547a790461ed94875e'
+          )
+          ">
+          <VideoCameraFilled />
+        </el-icon>
       </div>
-      <el-table
-        :data="tableData"
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        row-key="authorityId"
-        style="width: 100%"
-      >
+      <el-table :data="tableData" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        row-key="authorityId" style="width: 100%">
         <el-table-column label="角色ID" min-width="180" prop="authorityId" />
-        <el-table-column
-          align="left"
-          label="角色名称"
-          min-width="180"
-          prop="authorityName"
-        />
-        <el-table-column
-          align="left"
-          label="责任门店"
-          min-width="180"
-          prop="shopInfoNames"
-        />
+        <el-table-column align="left" label="角色名称" min-width="180" prop="authorityName" />
+        <el-table-column align="left" label="责任门店" min-width="180" prop="shopInfoNames" />
+        <el-table-column align="left" label="是否总管理员" min-width="180" prop="admin">
+          <template #default="{ row }">
+            <span>{{ row.admin == 1 ? '是' : '否' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="left" label="操作" width="460">
           <template #default="scope">
-            <el-button
-              icon="setting"
-              type="primary"
-              link
-              @click="openDrawer(scope.row)"
-              >设置权限</el-button
-            >
-            <el-button
-              icon="plus"
-              type="primary"
-              link
-              @click="addAuthority(scope.row.authorityId)"
-              >新增子角色</el-button
-            >
-            <el-button
-              icon="copy-document"
-              type="primary"
-              link
-              @click="copyAuthorityFunc(scope.row)"
-              >拷贝</el-button
-            >
-            <el-button
-              icon="edit"
-              type="primary"
-              link
-              @click="editAuthority(scope.row)"
-              >编辑</el-button
-            >
-            <el-button
-              icon="delete"
-              type="primary"
-              link
-              @click="deleteAuth(scope.row)"
-              >删除</el-button
-            >
+            <el-button icon="setting" type="primary" link @click="openDrawer(scope.row)">设置权限</el-button>
+            <el-button icon="plus" type="primary" link @click="addAuthority(scope.row.authorityId)">新增子角色</el-button>
+            <el-button icon="copy-document" type="primary" link @click="copyAuthorityFunc(scope.row)">拷贝</el-button>
+            <el-button icon="edit" type="primary" link @click="editAuthority(scope.row)">编辑</el-button>
+            <el-button icon="delete" type="primary" link @click="deleteAuth(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     <!-- 新增角色弹窗 -->
     <el-dialog v-model="dialogFormVisible" :title="dialogTitle">
-      <el-form
-        v-loading="formLoading"
-        ref="authorityForm"
-        :model="form"
-        :rules="rules"
-        label-width="80px"
-      >
+      <el-form v-loading="formLoading" ref="authorityForm" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="父级角色" prop="parentId">
-          <el-cascader
-            v-model="form.parentId"
-            style="width: 100%"
-            :disabled="dialogType === 'add'"
-            :options="AuthorityOption"
-            :props="{
+          <el-cascader v-model="form.parentId" style="width: 100%" :disabled="dialogType === 'add'"
+            :options="AuthorityOption" :props="{
               checkStrictly: true,
               label: 'authorityName',
               value: 'authorityId',
               disabled: 'disabled',
               emitPath: false,
-            }"
-            :show-all-levels="false"
-            filterable
-          />
+            }" :show-all-levels="false" filterable />
         </el-form-item>
         <el-form-item label="角色ID" prop="authorityId">
-          <el-input
-            v-model="form.authorityId"
-            :disabled="dialogType === 'edit'"
-            autocomplete="off"
-            maxlength="15"
-          />
+          <el-input v-model="form.authorityId" :disabled="dialogType === 'edit'" autocomplete="off" maxlength="15" />
         </el-form-item>
         <el-form-item label="角色姓名" prop="authorityName">
           <el-input v-model="form.authorityName" autocomplete="off" />
         </el-form-item>
+        <el-form-item label="是否是总管理员" prop="admin">
+          <el-select v-model="form.admin" placeholder="请选择">
+            <el-option label="否" :value="0"></el-option>
+            <el-option label="是" :value="1"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="责任门店" prop="shopInfos">
-          <el-select
-            v-model="form.shopInfos"
-            multiple
-            placeholder="请选择责任门店"
-            style="width: 240px"
-          >
-            <el-option
-              v-for="item in shopInfos"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
+          <el-select v-model="form.shopInfos" multiple placeholder="请选择责任门店" style="width: 240px">
+            <el-option v-for="item in shopInfos" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -137,13 +72,7 @@
       </template>
     </el-dialog>
 
-    <el-drawer
-      v-if="drawer"
-      v-model="drawer"
-      :with-header="false"
-      size="40%"
-      title="角色配置"
-    >
+    <el-drawer v-if="drawer" v-model="drawer" :with-header="false" size="40%" title="角色配置">
       <el-tabs :before-leave="autoEnter" type="border-card">
         <el-tab-pane label="角色菜单">
           <Menus ref="menus" :row="activeRow" @changeRow="changeRow" />
@@ -152,12 +81,7 @@
           <Apis ref="apis" :row="activeRow" @changeRow="changeRow" />
         </el-tab-pane>
         <el-tab-pane label="资源权限">
-          <Datas
-            ref="datas"
-            :authority="tableData"
-            :row="activeRow"
-            @changeRow="changeRow"
-          />
+          <Datas ref="datas" :authority="tableData" :row="activeRow" @changeRow="changeRow" />
         </el-tab-pane>
       </el-tabs>
     </el-drawer>
@@ -214,6 +138,7 @@ const form = ref({
   authorityId: 0,
   authorityName: "",
   parentId: 0,
+  admin: 0,
   shopInfos: [],
 });
 const rules = ref({
@@ -343,7 +268,7 @@ const enterDialog = () => {
             console.log(form.value, "表单数据");
             const res = await createAuthority({
               ...form.value,
-              shopInfos: form.value.shopInfos.map((item) => {
+              shopInfos: (!form.value.shopInfos || form.value.shopInfos.length == 0)?[]:form.value.shopInfos.map((item) => {
                 return {
                   id: item,
                 };
@@ -363,7 +288,7 @@ const enterDialog = () => {
           {
             const res = await updateAuthority({
               ...form.value,
-              shopInfos: form.value.shopInfos.map((item) => {
+              shopInfos: (!form.value.shopInfos || form.value.shopInfos.length == 0)?[]:form.value.shopInfos.map((item) => {
                 return {
                   id: item,
                 };
@@ -496,11 +421,13 @@ const getAllShopInfos = () => {
 .authority {
   .el-input-number {
     margin-left: 15px;
+
     span {
       display: none;
     }
   }
 }
+
 .tree-content {
   margin-top: 10px;
   height: calc(100vh - 158px);

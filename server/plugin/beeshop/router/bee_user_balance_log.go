@@ -22,8 +22,9 @@ func (s *BeeUserBalanceLogRouter) InitBeeUserBalanceLogRouter(Router *gin.Router
 		beeUserBalanceLogRouter.PUT("updateBeeUserBalanceLog", beeUserBalanceLogApi.UpdateBeeUserBalanceLog)              // 更新用户消费记录
 	}
 	{
-		beeUserBalanceLogRouterWithoutRecord.GET("findBeeUserBalanceLog", beeUserBalanceLogApi.FindBeeUserBalanceLog)       // 根据ID获取用户消费记录
-		beeUserBalanceLogRouterWithoutRecord.GET("getBeeUserBalanceLogList", beeUserBalanceLogApi.GetBeeUserBalanceLogList) // 获取用户消费记录列表
+		beeUserBalanceLogRouterWithoutRecord.GET("findBeeUserBalanceLog", beeUserBalanceLogApi.FindBeeUserBalanceLog)         // 根据ID获取用户消费记录
+		beeUserBalanceLogRouterWithoutRecord.GET("getBeeUserBalanceLogList", beeUserBalanceLogApi.GetBeeUserBalanceLogList)   // 获取用户消费记录列表
+		beeUserBalanceLogRouterWithoutRecord.GET("getBeeUserBalanceLogCount", beeUserBalanceLogApi.GetBeeUserBalanceLogCount) // 获取用户消费记录总数
 	}
 	{
 		beeUserBalanceLogRouterWithoutAuth.GET("getBeeUserBalanceLogPublic", beeUserBalanceLogApi.GetBeeUserBalanceLogPublic) // 获取用户消费记录列表

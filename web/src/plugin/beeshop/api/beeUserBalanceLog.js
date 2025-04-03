@@ -95,3 +95,10 @@ export const getBeeUserBalanceLogList = (params) => {
     params
   })
 }
+export const getBeeUserBalanceLogCount = (params) => {
+  return service({
+    url: '/bee-shop/beeUserBalanceLog/getBeeUserBalanceLogCount',
+    method: 'get',
+    params
+  })
+}

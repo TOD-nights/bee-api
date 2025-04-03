@@ -23,7 +23,7 @@ type BeeCoupon struct {
 	MoneyHreshold        *float64   `json:"moneyHreshold" form:"moneyHreshold" gorm:"column:money_hreshold;comment:满xx可用;size:20;"`                           //满xx可用
 	MoneyMax             *float64   `json:"moneyMax" form:"moneyMax" gorm:"column:money_max;comment:优惠券最大金额;size:20;"`                                        //优惠券最大金额
 	MoneyMin             *float64   `json:"moneyMin" form:"moneyMin" gorm:"column:money_min;comment:优惠券最小金额;size:20;"`                                        //优惠券最小金额
-	MoneyType            *int       `json:"moneyType" form:"moneyType" gorm:"column:money_type;comment:类型，1满xx，2折扣;size:19;"`                                 //类型，1满xx，2折扣
+	MoneyType            *int       `json:"moneyType" form:"moneyType" gorm:"column:money_type;comment:类型，0固定优惠，1比例折扣;size:19;"`                              //类型，1满xx，2折扣
 	Name                 string     `json:"name" form:"name" gorm:"column:name;comment:优惠券名字;size:100;"`                                                      //优惠券名字
 	NeedAmount           *float64   `json:"needAmount" form:"needAmount" gorm:"column:need_amount;comment:需要支付;size:20;"`                                     //需要支付
 	NeedScore            *float64   `json:"needScore" form:"needScore" gorm:"column:need_score;comment:需要积分;size:20;"`                                        //需要积分

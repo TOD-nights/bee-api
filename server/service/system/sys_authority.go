@@ -119,7 +119,7 @@ func (authorityService *AuthorityService) UpdateAuthority(auth system.SysAuthori
 		return system.SysAuthority{}, errors.New("查询角色数据失败")
 	}
 	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
-		err = global.GVA_DB.Debug().Model(&oldAuthority).Updates(&auth).Error
+		err = global.GVA_DB.Debug().Model(&oldAuthority).Select("*").Updates(&auth).Error
 		if err != nil {
 			return err
 		}
@@ -127,7 +127,6 @@ func (authorityService *AuthorityService) UpdateAuthority(auth system.SysAuthori
 		if err != nil {
 			return err
 		}
-
 		return nil
 
 	})

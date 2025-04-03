@@ -34,7 +34,7 @@
         "request": "launch",
         "cwd": "${workspaceFolder:frontend}",
         "name": "Frontend",
-        "runtimeExecutable": "npm",
+        "runtimeExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
         "runtimeArgs": ["run-script", "serve"]
       }
     ],
