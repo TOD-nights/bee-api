@@ -84,7 +84,9 @@
 
 <!-- 添加今日流水卡片 -->
  <!-- 全部商店-->
- <el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
+ <el-card 
+ v-if="isAdmin" 
+ @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
   <el-statistic 
     :value="todayAmount" 
     :precision="2"
@@ -118,7 +120,9 @@
     <!-- 添加今日订单数卡片 -->
 
 
-    <el-card @click="gotoPage('/bee_index/shop-order-admin/beeOrder')">
+    <el-card 
+    v-if="isAdmin" 
+    @click="gotoPage('/bee_index/shop-order-admin/beeOrder')">
   <el-statistic 
     :value="todayOrderCount" 
   >
@@ -153,7 +157,9 @@
 
 
 
-<el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
+<el-card 
+v-if="isAdmin" 
+@click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
   <el-statistic 
     :value="todayRechargeTotal" 
     :precision="2"
@@ -169,7 +175,7 @@
 
 
 
-<!-- 添加选中商店今日充值卡片
+<!-- 添加选中商店今日充值卡片-->
 
 
 <el-card @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')">
@@ -184,7 +190,7 @@
       <span class="text-sm">元</span>
     </template>
   </el-statistic>
-</el-card>-->
+</el-card>
 
 
 
@@ -193,7 +199,9 @@
 <!-- 添加今日支付卡片 -->
 
 
-<el-card @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
+<el-card 
+v-if="isAdmin" 
+@click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
   <el-statistic 
     :value="todayPaymentTotal" 
     :precision="2"
@@ -209,7 +217,7 @@
 
 
 
-<!-- 添加选中商店今日支付卡片 -->
+<!-- 添加选中商店今日支付卡片 
 
 
 <el-card @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
@@ -224,7 +232,7 @@
       <span class="text-sm">元</span>
     </template>
   </el-statistic>
-</el-card>
+</el-card>-->
 
 
 
@@ -271,6 +279,7 @@
 
 
     <gva-card
+    v-if="isAdmin" 
       title="待办事项"
       custom-class="col-span-1 md:col-span-6 lg:col-span-6 row-span-2"
     >
@@ -320,6 +329,11 @@ import { getBeeShopGoodsList } from "@/plugin/beeshop/api/beeShopGoods";
 import { formatDate, formatEnum, getDictFunc } from "@/utils/format";
 import { useRoute, useRouter } from "vue-router";
 import { getAllMyBeeShopInfos } from "@/plugin/beeshop/api/beeShopInfo";
+
+//判断是否为管理员
+import { computed } from 'vue'
+import { useUserStore } from '@/pinia/modules/user'
+
 const route = useRoute();
 const router = useRouter();
 
@@ -696,6 +710,17 @@ const gotoPage = async (page) => {
 const gotoTodoPage = (row) => {
   gotoPage("/bee_index/shop-order-admin/beeOrderDetail?id=" + row.id);
 };
+
+
+const userStore = useUserStore()
+
+// 判断是否是管理员
+const isAdmin = computed(() => {
+  return userStore.userInfo.authorities?.some(role => role.admin === 1) || false
+})
+
 </script>
 
 <style lang="scss" scoped></style>
+
+
