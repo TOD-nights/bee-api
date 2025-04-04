@@ -55,7 +55,7 @@ npm install
 npm run build# 生产环境
 
 powershell把打包出来的dist文件夹去替换/var/www/bee文件 
-scp -r "D:\progetti\coffee\bee-api-git\web\dist\*" root@47.98.186.186:/var/www/bee/
+scp -r "D:\progetti\coffee\bee-api-gitee\web\dist\*" root@47.98.186.186:/var/www/bee/
 Woshinibaba88!
 # 检查文件是否上传成功
 ls -la /var/www/bee/
