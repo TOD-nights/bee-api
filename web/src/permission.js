@@ -130,6 +130,7 @@ const removeLoading = () => {
 router.afterEach(() => {
   // 路由加载完成后关闭进度条
   document.getElementsByClassName('main-cont main-right')[0]?.scrollTo(0, 0)
+  console.log("页面加载完成");
   removeLoading()
   Nprogress.done()
 })

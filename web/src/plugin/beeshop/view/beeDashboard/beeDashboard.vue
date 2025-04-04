@@ -12,6 +12,7 @@
     <el-col :xs="24" :sm="24" :md="8" :lg="6" class="mb-2">
       <el-select 
         v-model="shopId" 
+        @change="shopIdChangeHandler"
         placeholder="请选择门店"
         style="width: 100%"
       >
@@ -296,6 +297,9 @@ const getTodayAmount = async () => {
   }
 };
 
+const shopIdChangeHandler = (v)=>{
+  console.log(v, "shopIdChangeHandler");
+}
 // 添加新的函数来获取选中商店的今日流水
 // 修改获取选中商店的今日流水的函数
 const getTodayAmountSelect = async () => {
@@ -465,6 +469,7 @@ watch(shopId, async (newVal) => {
     await getTodayAmountSelect();
     await getTodayOrderCountSelect();
     await getTodayBalanceLogSelect();
+    await getTodayBalanceLog();
   } else {
     todayAmountSelect.value = 0; // 没有选择时清零
     todayOrderCountSelect.value = 0;
