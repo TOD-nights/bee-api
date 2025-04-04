@@ -384,9 +384,13 @@ const rechargeLog = await getBeeUserBalanceLogCount({
     type: 'recharge',  // 获取充值记录
     shopId: shopId.value
   }).then(res=>{
-    if(res.code == 200){
-      todayRechargeSelect.value = res.data
+    console.log(res,'----')
+    if(res.code == 0){
+     
+      todayRechargeSelect.value = res.data.data
     }
+  }).catch(err=>{
+    console.log(err,'err')
   })
 
   const paymentLog = await getBeeUserBalanceLogList({
