@@ -170,27 +170,30 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(info beeReq.Bee
 			}
 		}
 	}
-
+	var orderPrefix = ""
+	if info.Type == "payment" {
+		orderPrefix = "pay_"
+	} else {
+		orderPrefix = "recharge_"
+	}
 	// 创建db
 	// 修改查询逻辑，使用 LEFT JOIN 而不是 INNER JOIN
-	db := GetBeeDB().Debug().Table(bee.BeeUserBalanceLog{}.TableName() + " as log ").
-		Joins("left join bee_order a on concat('pay',a.order_number) = log.order_id").
-		Joins("left join bee_shop_info b on a.shop_id = b.id")
+	db := GetBeeDB().Debug().Table(bee.BeePayLog{}.TableName() + " as log ").
+		Joins("left join bee_user_balance_log a on concat('" + orderPrefix + "',log.order_no) = a.order_id").
+		Joins("left join bee_shop_info b on log.shop_id = b.id")
 
 	// 基础条件
 	//db = db.Where("log.user_id = ?", shopUserId)
 
 	// 根据 type 参数过滤记录
 	if info.Type == "payment" {
-		db = db.Where("log.mark = ?", "订单支付")
+		db = db.Where("a.order_id like ?", "pay_%")
 	} else if info.Type == "recharge" {
-		db = db.Where("log.order_id like ?", "recharge_%")
+		db = db.Where("a.order_id like ?", "recharge_%")
 	}
 	if !adminFlag {
 		if len(shopIds) > 0 {
-			db = db.Where("a.shop_id in ?", shopIds)
-		} else {
-			db = db.Where("a.shop_id = -1")
+			db = db.Where("log.shop_id in ?", shopIds)
 		}
 	}
 	// 如果有条件搜索 下方会自动创建搜索语句
@@ -202,10 +205,10 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(info beeReq.Bee
 	}
 
 	if info.ShopId > 0 {
-		db = db.Where("a.shop_id = ?", info.ShopId)
+		db = db.Where("log.shop_id = ?", info.ShopId)
 	}
 	var sum float64
-	err := db.Select("ifnull(sum(num),0)").Scan(&sum).Error
+	err := db.Select("ifnull(sum(money),0)").Scan(&sum).Error
 	if err != nil {
 		return 0, err
 	}
