@@ -1120,6 +1120,42 @@ func (s *OrderSrv) PayByBalance(c context.Context, ip, orderId string, code stri
 	}
 	return s.PayOrderByBalance(c, ip, payLog, cast.ToString(orderInfo.Id), "balance_"+util.GetRandInt64(), decimal.Zero)
 }
+func (s *OrderSrv) PayByBalance_1(c context.Context, ip, orderId string) error {
+	orderNumArr := strings.Split(orderId, ",")
+	// @todo 短信验证码检查
+	amount, err := GetBalanceSrv().GetAmount(c, kit.GetUid(c))
+	if err != nil {
+		return err
+	}
+	//if amount.Pwd != "" && amount.Pwd != util.Md5(amount.GetPwdEncode(pwd)) {
+	//	return errors.New("密码错误")
+	//}
+	if len(orderNumArr) > 1 {
+		return errors.New("目前不支持同时支付多个订单")
+	}
+	// check余额
+	orderInfo, err := s.GetOrderByOrderId(c, cast.ToInt64(orderNumArr[0]))
+	if err != nil {
+		return errors.Wrap(err, "获取订单信息失败")
+	}
+	if orderInfo.AmountReal.GreaterThan(amount.Balance) {
+		return errors.New("余额不足")
+	}
+	payLog := &model.BeePayLog{
+		BaseModel:  *kit.GetInsertBaseModel(c),
+		Money:      orderInfo.AmountReal,
+		NextAction: "",
+		OrderNo:    util.GetRandInt64(),
+		PayGate:    enum.PayGateBalance,
+		Remark:     "",
+		Status:     enum.PayLogStatusUnPaid,
+		Uid:        kit.GetUid(c),
+	}
+	if err = db.GetDB().Create(payLog).Error; err != nil {
+		return err
+	}
+	return s.PayOrderByBalance(c, ip, payLog, cast.ToString(orderInfo.Id), "balance_"+util.GetRandInt64(), decimal.Zero)
+}
 
 func (s *OrderSrv) Detail(c context.Context, orderId int64, hxNumber string) (*proto.GetOrderDetailResp, error) {
 	if orderId <= 0 && hxNumber == "" {

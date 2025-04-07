@@ -51,7 +51,14 @@ func (api OrderApi) Pay(c *gin.Context) {
 	}
 	api.Res(c, nil, err)
 }
-
+func (api OrderApi) BalancePay(c *gin.Context) {
+	orderId := c.PostForm("orderId") // 订单id, 多个订单之间用英文逗号分隔 	// 密码
+	err := service.GetOrderSrv().PayByBalance_1(c, c.ClientIP(), orderId)
+	if err != nil {
+		logger.GetLogger().Info(err.Error())
+	}
+	api.Res(c, nil, err)
+}
 func (api OrderApi) Delete(c *gin.Context) {
 	orderId := cast.ToInt64(c.PostForm("orderId"))
 

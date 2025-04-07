@@ -256,6 +256,7 @@ func NewRouter() *gin.Engine {
 		orderGroup.GET("/list", (api.OrderApi{}).List)
 		orderGroup.POST("/list", (api.OrderApi{}).List)
 		orderGroup.POST("/pay", (api.OrderApi{}).Pay)
+		orderGroup.POST("/balance_pay", (api.OrderApi{}).BalancePay)
 		orderGroup.POST("/create", (api.OrderApi{}).Create)
 		orderGroup.POST("/close", (api.OrderApi{}).Close)
 		orderGroup.POST("/delete", (api.OrderApi{}).Delete)
