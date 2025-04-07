@@ -33,6 +33,7 @@ func (beePayLogApi *BeePayLogApi) CreateBeePayLog(c *gin.Context) {
 	}
 	shopUserId := int(utils.GetShopUserID(c))
 	beePayLog.UserId = &shopUserId
+
 	if err := beePayLogService.CreateBeePayLog(&beePayLog); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)

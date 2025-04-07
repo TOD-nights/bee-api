@@ -16,6 +16,7 @@ type BeePayLog struct {
 	Money        *float64   `json:"money" form:"money" gorm:"column:money;comment:总金额;size:10;"`                          //总金额
 	NextAction   string     `json:"nextAction" form:"nextAction" gorm:"column:next_action;comment:next_action;size:100;"` //next_action
 	OrderNo      string     `json:"orderNo" form:"orderNo" gorm:"column:order_no;comment:order_no;size:100;"`             //order_no
+	OrderNumber  string     `json:"orderNo" form:"orderNo" gorm:"column:order_no;comment:order_no;size:100;"`             //order_no
 	ThirdOrderNo string     `json:"thirdOrderNo" gorm:"column:third_order_no;type:varchar(200);comment:第三方订单号"`
 	PayGate      string     `json:"payGate" form:"payGate" gorm:"column:pay_gate;comment:pay_gate;size:100;"` //pay_gate
 	Remark       string     `json:"remark" form:"remark" gorm:"column:remark;comment:remark;size:100;"`       //remark

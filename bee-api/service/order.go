@@ -917,14 +917,15 @@ func (s *OrderSrv) PayOrderOffline(c context.Context, orderId string, extraTx ..
 		return errors.New("不是未支付状态")
 	}
 	payLog := &model.BeePayLog{
-		BaseModel:  *kit.GetInsertBaseModel(c),
-		Money:      orderInfo.AmountReal,
-		NextAction: "",
-		OrderNo:    util.GetRandInt64(),
-		PayGate:    enum.PayGateBalance,
-		Remark:     "",
-		Status:     enum.PayLogStatusUnPaid,
-		Uid:        orderInfo.Uid,
+		BaseModel:   *kit.GetInsertBaseModel(c),
+		Money:       orderInfo.AmountReal,
+		NextAction:  "",
+		OrderNo:     util.GetRandInt64(),
+		PayGate:     enum.PayGateBalance,
+		Remark:      "",
+		Status:      enum.PayLogStatusUnPaid,
+		Uid:         orderInfo.Uid,
+		OrderNumber: orderId,
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err
@@ -1106,14 +1107,15 @@ func (s *OrderSrv) PayByBalance(c context.Context, ip, orderId string, code stri
 		return errors.New("余额不足")
 	}
 	payLog := &model.BeePayLog{
-		BaseModel:  *kit.GetInsertBaseModel(c),
-		Money:      orderInfo.AmountReal,
-		NextAction: "",
-		OrderNo:    util.GetRandInt64(),
-		PayGate:    enum.PayGateBalance,
-		Remark:     "",
-		Status:     enum.PayLogStatusUnPaid,
-		Uid:        kit.GetUid(c),
+		BaseModel:   *kit.GetInsertBaseModel(c),
+		Money:       orderInfo.AmountReal,
+		NextAction:  "",
+		OrderNo:     util.GetRandInt64(),
+		PayGate:     enum.PayGateBalance,
+		Remark:      "",
+		Status:      enum.PayLogStatusUnPaid,
+		Uid:         kit.GetUid(c),
+		OrderNumber: orderId,
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err
