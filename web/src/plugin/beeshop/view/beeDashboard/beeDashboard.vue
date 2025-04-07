@@ -577,12 +577,12 @@ watch(shopId, async (newVal) => {
 
 
 const init = async () => {
-  //await getTodayAmount(); // 初始化时获取今日流水
-  //await getTodayAmountSelect(); // 初始化时获取今日选择商店流水
-  //await getTodayOrderCount(); // 获取今日订单数
-  //await getTodayOrderCountSelect();
-  //await getTodayBalanceLog();
-  //await getTodayBalanceLogSelect();
+  await getTodayAmount(); // 初始化时获取今日流水
+  await getTodayAmountSelect(); // 初始化时获取今日选择商店流水
+  await getTodayOrderCount(); // 获取今日订单数
+  await getTodayOrderCountSelect();
+  await getTodayBalanceLog();
+  await getTodayBalanceLogSelect();
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   for (let i = 7; i >= 0; i--) {
@@ -658,7 +658,7 @@ const init = async () => {
       payData.value.push(payDataTable.data.total);
     }
   }
-  // await refreshOrders();
+  await refreshOrders();
   getAllMyBeeShopInfos().then((res) => {
     if (res.code == 0) {
       shops.value = res.data.list;
