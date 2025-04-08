@@ -3,6 +3,7 @@ package bee
 import (
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/gin-gonic/gin"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/dto"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee"
@@ -60,7 +61,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLog(id string, shopUserId int
 
 // GetBeePayLogInfoList 分页获取支付流水记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(info beeReq.BeePayLogSearch, shopUserId int) (list []dto.BeePayLogInfoDto, total int64, err error) {
+func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(c *gin.Context, info beeReq.BeePayLogSearch, shopUserId int) (list []dto.BeePayLogInfoDto, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
@@ -89,6 +90,13 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(info beeReq.BeePa
 	if info.Uid != nil {
 		db = db.Where("bee_pay_log.uid = ?", info.Uid)
 	}
+
+	if _, exist := c.Get("admin"); !exist {
+		if shopIds, exist := c.Get("shopIds"); exist {
+			db = db.Where("a.shop_id IN (?)", shopIds)
+		}
+	}
+
 	err = db.Count(&total).Error
 	if err != nil {
 		return

@@ -1142,14 +1142,15 @@ func (s *OrderSrv) PayByBalance_1(c context.Context, ip, orderId string) error {
 		return errors.New("余额不足")
 	}
 	payLog := &model.BeePayLog{
-		BaseModel:  *kit.GetInsertBaseModel(c),
-		Money:      orderInfo.AmountReal,
-		NextAction: "",
-		OrderNo:    util.GetRandInt64(),
-		PayGate:    enum.PayGateBalance,
-		Remark:     "",
-		Status:     enum.PayLogStatusUnPaid,
-		Uid:        kit.GetUid(c),
+		BaseModel:   *kit.GetInsertBaseModel(c),
+		Money:       orderInfo.AmountReal,
+		NextAction:  "",
+		OrderNo:     util.GetRandInt64(),
+		OrderNumber: orderInfo.OrderNumber,
+		PayGate:     enum.PayGateBalance,
+		Remark:      "",
+		Status:      enum.PayLogStatusUnPaid,
+		Uid:         kit.GetUid(c),
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err

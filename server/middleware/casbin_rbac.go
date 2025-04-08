@@ -25,11 +25,26 @@ func CasbinHandler() gin.HandlerFunc {
 		act := c.Request.Method
 		// 获取用户的角色
 		sub := strconv.Itoa(int(waitUse.AuthorityId))
-		var authority system.SysAuthority
-		global.GVA_DB.Model(&system.SysAuthority{}).First(&authority, sub)
-		if authority.Admin == 1 {
+		var sysUser system.SysUser
+		if err := global.GVA_DB.Model(&system.SysUser{}).Preload("Authorities").Preload("Authorities.ShopInfos").First(&sysUser, waitUse.BaseClaims.ID).Error; err != nil {
+			response.FailWithDetailed(gin.H{}, "权限不足", c)
+			c.Abort()
+		}
+		var admin = false
+		if len(sysUser.Authorities) == 0 {
+			response.FailWithDetailed(gin.H{}, "权限不足", c)
+			c.Abort()
+		}
+		for _, v := range sysUser.Authorities {
+			if v.Admin == 1 {
+				admin = true
+			}
+		}
+		if admin {
+			c.Set("admin", true)
 			c.Next()
 		} else {
+
 			e := casbinService.Casbin() // 判断策略中是否存在
 			success, _ := e.Enforce(sub, obj, act)
 			if !success {
@@ -37,6 +52,13 @@ func CasbinHandler() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
+			var shopIds []int
+			for _, v := range sysUser.Authorities {
+				for _, shop := range v.ShopInfos {
+					shopIds = append(shopIds, *shop.Id)
+				}
+			}
+			c.Set("shopIds", shopIds)
 			c.Next()
 		}
 	}

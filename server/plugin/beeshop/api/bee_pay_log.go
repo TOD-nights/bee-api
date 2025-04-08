@@ -143,7 +143,7 @@ func (beePayLogApi *BeePayLogApi) GetBeePayLogList(c *gin.Context) {
 		return
 	}
 	shopUserId := int(utils.GetShopUserID(c))
-	if list, total, err := beePayLogService.GetBeePayLogInfoList(pageInfo, shopUserId); err != nil {
+	if list, total, err := beePayLogService.GetBeePayLogInfoList(c, pageInfo, shopUserId); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {

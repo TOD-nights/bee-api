@@ -194,7 +194,7 @@ func (beeOrderPeisongApi *BeeOrderPeisongApi) GetBeeOrderPeisongList(c *gin.Cont
 		return
 	}
 	shopUserId := int(utils.GetShopUserID(c))
-	if list, total, err := beeOrderPeisongService.GetBeeOrderPeisongInfoList(pageInfo, shopUserId); err != nil {
+	if list, total, err := beeOrderPeisongService.GetBeeOrderPeisongInfoList(c, pageInfo, shopUserId); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {

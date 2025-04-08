@@ -6,6 +6,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee"
 	beeReq "github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/utils"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 )
 
@@ -79,7 +80,7 @@ func (beeOrderPeisongService *BeeOrderPeisongService) GetBeeOrderPeisong(id stri
 
 // GetBeeOrderPeisongInfoList 分页获取beeOrderPeisong表记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (beeOrderPeisongService *BeeOrderPeisongService) GetBeeOrderPeisongInfoList(info beeReq.BeeOrderPeisongSearch, shopUserId int) (list []bee.BeeOrderPeisong, total int64, err error) {
+func (beeOrderPeisongService *BeeOrderPeisongService) GetBeeOrderPeisongInfoList(c *gin.Context, info beeReq.BeeOrderPeisongSearch, shopUserId int) (list []bee.BeeOrderPeisong, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
