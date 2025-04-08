@@ -666,7 +666,7 @@ const init = async () => {
   });
   const orderTable = await getBeeOrderList({
     page: 1,
-    pageSize: 100,
+    pageSize: 0,
     status: 1,
   });
   if (orderTable.code === 0) {
@@ -694,7 +694,7 @@ init();
 const refreshOrders = async () => {
   const ordersRes =  await orderList({
     page: pageNum.value,
-    pageSize: 10,
+    pageSize: 0,
     shopId: shopId.value,
     startDateAdd:dates.value[0],
     endDateAdd:dates.value[1]
