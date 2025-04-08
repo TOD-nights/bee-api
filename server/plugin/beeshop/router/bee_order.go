@@ -27,6 +27,7 @@ func (s *BeeOrderRouter) InitBeeOrderRouter(Router *gin.RouterGroup, PublicRoute
 		beeOrderRouter.PUT("shippedBeeOrder", beeOrderApi.ShippedBeeOrder)                   // 设置为已发货订单
 		beeOrderRouter.GET("getBeeOrderList", beeOrderApi.GetBeeOrderList)                   // 获取用户订单列表
 		beeOrderRouter.GET("orderList", beeOrderApi.OrderList)                               // 门店订单列表
+		beeOrderRouter.GET("orderStatistic", beeOrderApi.OrderStatistic)                     // 订单统计
 	}
 	{
 		beeOrderRouterWithoutRecord.GET("findBeeOrder", beeOrderApi.FindBeeOrder) // 根据ID获取用户订单

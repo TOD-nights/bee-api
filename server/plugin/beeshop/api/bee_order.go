@@ -316,3 +316,28 @@ func (api *BeeOrderApi) OrderList(c *gin.Context) {
 		}
 	}
 }
+
+// ShippedBeeOrder 订单统计
+// @Tags BeeOrder
+// @Summary 订单统计
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {object} response.Response{msg=string} "设置成功"
+// @Router /beeOrder/orderStatistic [get]
+func (api *BeeOrderApi) OrderStatistic(c *gin.Context) {
+	var param beeReq.BeeOrderSearch
+
+	if err := c.ShouldBindQuery(&param); err != nil {
+		response.FailWithMessage("请求参数异常", c)
+	} else {
+		loginUserId := beeUtils.GetUserID(c)
+		if res, err := beeOrderService.OrderStatistic(c, param, 100, loginUserId); err != nil {
+			response.FailWithMessage("查询异常", c)
+		} else {
+			response.OkWithData(response.Response{
+				Data: res,
+			}, c)
+		}
+	}
+}

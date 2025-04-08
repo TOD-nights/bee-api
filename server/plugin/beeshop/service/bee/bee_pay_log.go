@@ -129,7 +129,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(c *gin.Context, i
 func (beePayLogService *BeePayLogService) GetBeePayTotal(info beeReq.BeePayLogSearch, shopUserId int) (total float64, err error) {
 	// 创建db
 	db := GetBeeDB().Debug().Model(&bee.BeePayLog{})
-	db = db.Where("user_id = ?", shopUserId)
+	db = db.Where("user_id = ? and status = 1", shopUserId)
 	if info.StartDateAdd != nil && info.EndDateAdd != nil {
 		db = db.Where("date_add BETWEEN ? AND ? ", info.StartDateAdd, info.EndDateAdd)
 	}

@@ -186,7 +186,7 @@ func (beeOrderService *BeeOrderService) GetBeeOrderInfoList(c *gin.Context, info
 		return
 	}
 	var sums []float64
-	if err = db.Session(&gorm.Session{}).Select("ifnull(sum(amount),0) amount").Pluck("amount", &sums).Error; err != nil {
+	if err = db.Session(&gorm.Session{}).Where("status = 1").Select("ifnull(sum(amount),0) amount").Pluck("amount", &sums).Error; err != nil {
 		global.GVA_LOG.Error("订单列表查询,统计订单总金额失败")
 		return
 	}
@@ -210,6 +210,40 @@ func (beeOrderService *BeeOrderService) GetBeeOrderInfoList(c *gin.Context, info
 	err = db.Find(&beeOrders).Error
 	sum = sums[0]
 	return beeOrders, total, sum, err
+}
+
+// GetBeeOrderInfoList 分页获取用户订单记录
+// Author [piexlmax](https://github.com/piexlmax)
+func (beeOrderService *BeeOrderService) OrderStatistic(c *gin.Context, info beeReq.BeeOrderSearch, shopUserId int, loginUserId uint) (map[string]interface{}, error) {
+
+	db := global.GVA_DB.Model(&bee.BeeOrder{}).Debug()
+	db = db.Where("user_id = ?", shopUserId).Where("is_pay = 1 and status = 1 and is_deleted = 0")
+
+	if info.StartDateAdd != nil && info.EndDateAdd != nil {
+		db = db.Where("date_add BETWEEN ? AND ? ", info.StartDateAdd, info.EndDateAdd)
+	}
+	if info.StartDateUpdate != nil && info.EndDateUpdate != nil {
+		db = db.Where("date_update BETWEEN ? AND ? ", info.StartDateUpdate, info.EndDateUpdate)
+	}
+
+	if _, exist := c.Get("admin"); !exist {
+		if shopIds, exist := c.Get("shopIds"); exist {
+			db = db.Where("shop_id IN (?)", shopIds)
+		}
+	}
+
+	var sum, todaySum float64
+	var count, todayCount int64
+	db.Count(&count)
+	db.Select("ifnull(sum(amount),0) amount").Scan(&sum)
+
+	if info.ShopId != nil && *info.ShopId > 0 {
+		tx := db.Where("shop_id = ?", info.ShopId)
+		tx.Count(&todayCount)
+		tx.Select("ifnull(sum(amount),0) amount").Scan(&todaySum)
+	}
+
+	return map[string]interface{}{"sum": sum, "count": count, "todaySum": todaySum, "todayCount": todayCount}, nil
 }
 
 func (beeOrderService *BeeOrderService) ShippedBeeOrder(id int64, shopUserId int) error {

@@ -191,3 +191,16 @@ export const orderList = (params) => {
     params
   })
 }
+
+/**
+ * 订单统计
+ * @param {*} params 
+ * @returns 
+ */
+export const orderStatistic = (params) => {
+  return service({
+    url: '/bee-shop/beeOrder/orderStatistic',
+    method: 'get',
+    params
+  })
+}

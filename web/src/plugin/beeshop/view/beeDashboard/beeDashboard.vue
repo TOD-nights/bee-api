@@ -237,48 +237,6 @@ v-if="isAdmin"
 </el-card>
 
 
-    <!--
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/shop-user-admin/beeUser')"
-    >
-      <gva-chart :data="userData" title="用户数" />
-    </gva-card>
-
-
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/shop-order-admin/beeOrder')"
-    >
-      <gva-chart :data="orderData" title="订单统计" />
-    </gva-card>
-    
-    
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeOrderTodo')"
-    >
-      <gva-chart :data="orderTodoData" title="订单待办" />
-    </gva-card>
-
-
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
-    >
-      <gva-chart :data="payData" title="总支付金额" />
-    </gva-card>
-
- 添加今日流水卡片 
-
-    <gva-card
-      custom-class="col-span-1 lg:col-span-2 h-32"
-      @click="gotoPage('/bee_index/beeFinancialManager/beePayLog')"
-    >
-      <gva-chart :data="payNumData" title="支付人数" />
-    </gva-card>-->
-
-
     <gva-card
     v-if="isAdmin" 
       title="待办事项"
@@ -325,7 +283,7 @@ import {
   getBeePayTotal,
 } from "@/plugin/beeshop/api/beePayLog";
 import { getBeeUserBalanceLogList,getBeeUserBalanceLogCount } from "@/plugin/beeshop/api/beeUserBalanceLog";
-import { getBeeOrderList, orderList } from "@/plugin/beeshop/api/beeOrder";
+import { getBeeOrderList, orderList,orderStatistic } from "@/plugin/beeshop/api/beeOrder";
 import { getBeeShopGoodsList } from "@/plugin/beeshop/api/beeShopGoods";
 import { formatDate, formatEnum, getDictFunc } from "@/utils/format";
 import { useRoute, useRouter } from "vue-router";
@@ -371,83 +329,27 @@ const todayOrderCount = ref(0);
 const todayAmountSelect = ref(0);
 const todayOrderCountSelect = ref(0);
 
-// 在 init 函数中添加获取今日流水的逻辑
-const getTodayAmount = async () => {
+
+const orderStatisticHandler = async()=>{
   const today = dayjs().startOf('day').toDate();
   const tonight = dayjs().endOf('day').toDate();
-    // 调用API获取今日支付总额
-  const todayPayment = await getBeePayTotal({
-    page: 1,
-    pageSize: 1,
-    startDateAdd: today,
-    endDateAdd: tonight,
-    sum: "money"
+  const orderStatisticRes = await orderStatistic({
+    status: 1,
+    shopId: shopId.value,
+    startDateAdd:today,
+    endDateAdd:tonight
   });
-  // 如果请求成功，更新todayAmount的值
-  if (todayPayment.code === 0) {
-    todayAmount.value = todayPayment.data.total || 0;
+  if (orderStatisticRes.code == 0) {
+    // console.log(orderStatisticRes.data, "orderStatisticRes.data");
+    todayAmount.value = orderStatisticRes.data.data.sum || 0;
+    todayOrderCount.value = orderStatisticRes.data.data.count || 0;
+    todayAmountSelect.value = orderStatisticRes.data.data.todaySum || 0;
+    todayOrderCountSelect.value = orderStatisticRes.data.data.todayCount || 0;
   }
-};
-
+}
 const shopIdChangeHandler = (v)=>{
   console.log(v, "shopIdChangeHandler");
 }
-// 添加新的函数来获取选中商店的今日流水
-// 修改获取选中商店的今日流水的函数
-const getTodayAmountSelect = async () => {
-  const today = dayjs().startOf('day').toDate();
-  const tonight = dayjs().endOf('day').toDate();
-  
-  // 使用 orderList 而不是 getBeePayTotal
-  const todayOrders = await orderList({
-    page: 1,
-    pageSize: 1000,  // 设置较大的数值以获取所有订单
-    shopId: shopId.value,
-    startDateAdd: today,
-    endDateAdd: tonight
-  });
-
-  if (todayOrders.code === 0) {
-    // 计算总金额
-    todayAmountSelect.value = todayOrders.data.sum || 0;
-  }
-};
-
-// 添加新函数来获取选中商店的今日订单数
-const getTodayOrderCountSelect = async () => {
-  const today = dayjs().startOf('day').toDate();
-  const tonight = dayjs().endOf('day').toDate();
-  
-  const todayOrders = await orderList({
-    page: 1,
-    pageSize: 1,
-    shopId: shopId.value,
-    startDateAdd: today,
-    endDateAdd: tonight
-  });
-
-  if (todayOrders.code === 0) {
-    todayOrderCountSelect.value = todayOrders.data.total || 0;
-  }
-};
-
-
-// 获取今日订单数的方法
-const getTodayOrderCount = async () => {
-  const today = dayjs().startOf('day').toDate();
-  const tonight = dayjs().endOf('day').toDate();
-  
-  const todayOrders = await getBeeOrderList({
-    page: 1,
-    pageSize: 1,
-    startDateAdd: today,
-    endDateAdd: tonight
-  });
-
-  if (todayOrders.code === 0) {
-    todayOrderCount.value = todayOrders.data.total || 0;
-  }
-};
 
 
 // 获取今日余额变动数据，区分充值和支付
@@ -577,87 +479,12 @@ watch(shopId, async (newVal) => {
 
 
 const init = async () => {
-  await getTodayAmount(); // 初始化时获取今日流水
-  await getTodayAmountSelect(); // 初始化时获取今日选择商店流水
-  await getTodayOrderCount(); // 获取今日订单数
-  await getTodayOrderCountSelect();
+  await orderStatisticHandler();
   await getTodayBalanceLog();
   await getTodayBalanceLogSelect();
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
-  for (let i = 7; i >= 0; i--) {
-    // 获取最近7天数据
-    const start = new Date(0);
-    const end = dayjs()
-      .add(-1 * i, "day")
-      .endOf("day")
-      .toDate();
-
-    const funcs = [];
-    funcs.push(
-      getBeeUserList({
-        page: 1,
-        pageSize: 1,
-        startDateAdd: start,
-        endDateAdd: end,
-      })
-    );
-    funcs.push(
-      getBeePayLogList({
-        page: 1,
-        pageSize: 1,
-        startDateAdd: start,
-        endDateAdd: end,
-        distinct: "uid",
-      })
-    );
-    funcs.push(
-      getBeeOrderList({
-        page: 1,
-        pageSize: 1,
-        startDateAdd: start,
-        endDateAdd: end,
-      })
-    );
-    funcs.push(
-      getBeeShopGoodsList({
-        page: 1,
-        pageSize: 1,
-        startDateAdd: start,
-        endDateAdd: end,
-      })
-    );
-    funcs.push(
-      getBeePayTotal({
-        page: 1,
-        pageSize: 1,
-        startDateAdd: start,
-        endDateAdd: end,
-        sum: "money",
-      })
-    );
-    const results = await Promise.all(funcs);
-    const userTable = results[0];
-    if (userTable.code === 0) {
-      userData.value.push(userTable.data.total);
-    }
-    const payLogUidTable = results[1];
-    if (payLogUidTable.code === 0) {
-      payNumData.value.push(payLogUidTable.data.total);
-    }
-    const orderTable = await results[2];
-    if (orderTable.code === 0) {
-      orderData.value.push(orderTable.data.total);
-    }
-    const goodsTable = await results[3];
-    if (goodsTable.code === 0) {
-      goodsData.value.push(goodsTable.data.total);
-    }
-    const payDataTable = await results[4];
-    if (payDataTable.code === 0) {
-      payData.value.push(payDataTable.data.total);
-    }
-  }
+  
   await refreshOrders();
   getAllMyBeeShopInfos().then((res) => {
     if (res.code == 0) {
@@ -692,6 +519,7 @@ const dateFmt = (time) => {
 init();
 // 加载订单流水
 const refreshOrders = async () => {
+  await orderStatisticHandler();
   const ordersRes =  await orderList({
     page: pageNum.value,
     pageSize: 0,

@@ -1151,6 +1151,7 @@ func (s *OrderSrv) PayByBalance_1(c context.Context, ip, orderId string) error {
 		Remark:      "",
 		Status:      enum.PayLogStatusUnPaid,
 		Uid:         kit.GetUid(c),
+		ShopId:      orderInfo.ShopId,
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err

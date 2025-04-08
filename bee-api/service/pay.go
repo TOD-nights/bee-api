@@ -328,6 +328,7 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 			return nil, errors.New("订单状态错误")
 		} else {
 			outTradeNo = orderInfo.OrderNumber
+			shopId = orderInfo.ShopId
 		}
 	}
 	payOrderId = util.GetRandInt64()
