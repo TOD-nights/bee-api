@@ -199,7 +199,7 @@ func (beeOrderApi *BeeOrderApi) GetBeeOrderList(c *gin.Context) {
 	shopUserId := int(utils.GetShopUserID(c))
 	loginUserId := beeUtils.GetUserID(c)
 
-	if list, total, _, err := beeOrderService.GetBeeOrderInfoList(pageInfo, shopUserId, loginUserId); err != nil {
+	if list, total, _, err := beeOrderService.GetBeeOrderInfoList(c, pageInfo, shopUserId, loginUserId); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -305,7 +305,7 @@ func (api *BeeOrderApi) OrderList(c *gin.Context) {
 		response.FailWithMessage("请求参数异常", c)
 	} else {
 		loginUserId := beeUtils.GetUserID(c)
-		if list, total, sum, err := beeOrderService.GetBeeOrderInfoList(param, 100, loginUserId); err != nil {
+		if list, total, sum, err := beeOrderService.GetBeeOrderInfoList(c, param, 100, loginUserId); err != nil {
 			response.FailWithMessage("查询异常", c)
 		} else {
 			response.OkWithData(response.PageResult{
