@@ -170,10 +170,8 @@
             >{{ item.isCancel ? '是' : '否' }} </el-tooltip></td>
             <td class="table-cell">{{ formatDate(item.dateUpdate) }} </td>
             <td class="table-cell">
-              <td class="table-cell">
                 <div><el-button type="text" @click="showDetailModal(item.id)">查看详情</el-button></div>
                 <div><el-button v-if="!item.isCancel" type="text" @click="showCancelModal(item.id)">取消配送</el-button></div>
-              </td>
             </td>
           </tr>
           </tbody>
