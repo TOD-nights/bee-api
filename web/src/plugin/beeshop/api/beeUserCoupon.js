@@ -10,7 +10,7 @@ import service from '@/utils/request'
 // @Router /beeUserCoupon/createBeeUserCoupon [post]
 export const createBeeUserCoupon = (data) => {
   return service({
-    url: '/bee-shop/beeUserCoupon/createBeeUserCoupon',
+    url: '/bee-shop/beeUserCoupon/createBeeUserCoupon?batch=' + data.batch,
     method: 'post',
     data
   })

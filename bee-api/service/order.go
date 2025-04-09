@@ -371,7 +371,8 @@ func (s *OrderSrv) CreateOrder(c context.Context, ip string, req *proto.CreateOr
 
 	amountLogisticsReal = amountLogistics
 	// 获取优惠券
-	couponList, err := GetCouponSrv().GetMyCouponListByStatus(uid, enum.CouponStatusNormal)
+
+	couponList, err := GetCouponSrv().GetMyCouponListByStatus(uid, []enum.CouponStatus{enum.CouponStatusNormal})
 	if err != nil {
 		return nil, errors.Wrap(err, "获取优惠券失败")
 	}

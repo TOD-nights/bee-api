@@ -10,10 +10,14 @@ type BeeUserCouponService struct{}
 
 // CreateBeeUserCoupon 创建用户优惠券记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (beeUserCouponService *BeeUserCouponService) CreateBeeUserCoupon(beeUserCoupon *bee.BeeUserCoupon) (err error) {
+func (beeUserCouponService *BeeUserCouponService) CreateBeeUserCoupon(beeUserCoupon *bee.BeeUserCoupon, batchNum int) (err error) {
 	beeUserCoupon.DateAdd = utils.NowPtr()
 	beeUserCoupon.DateUpdate = utils.NowPtr()
-	err = GetBeeDB().Create(beeUserCoupon).Error
+	var coupons []*bee.BeeUserCoupon
+	for range batchNum {
+		coupons = append(coupons, beeUserCoupon)
+	}
+	err = GetBeeDB().Create(coupons).Error
 	return err
 }
 
