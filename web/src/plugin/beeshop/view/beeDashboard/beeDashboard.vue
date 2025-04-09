@@ -197,78 +197,8 @@ v-if="isAdmin"
 
 
 
-<!-- 添加今日支付卡片 -->
 
 
-<el-card 
-v-if="isAdmin" 
-@click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
-  <el-statistic 
-    :value="todayPaymentTotal" 
-    :precision="2"
-  >
-    <template #title>
-      <div class="font-bold">今日全部商店余额支付金额</div>
-    </template>
-    <template #suffix>
-      <span class="text-sm">元</span>
-    </template>
-  </el-statistic>
-</el-card>
-
-
-
-<!-- 添加选中商店今日支付卡片 -->
-
-
-
-<el-card @click="gotoPage('/bee_index/beeFinancialManager/beeUserBalanceLog')">
-  <el-statistic 
-    :value="todayPaymentSelect" 
-    :precision="2"
-  >
-    <template #title>
-      <div class="font-bold">今日选择商店余额支付金额</div>
-    </template>
-    <template #suffix>
-      <span class="text-sm">元</span>
-    </template>
-  </el-statistic>
-</el-card>
-
-
-    <gva-card
-    v-if="isAdmin" 
-      title="待办事项"
-      custom-class="col-span-1 md:col-span-6 lg:col-span-6 row-span-2"
-    >
-      <div>
-        <el-table
-          :data="orderTodo.list"
-          stripe
-          style="width: 100% ; height: 300px "
-          @row-click="gotoTodoPage"
-        >
-          <el-table-column prop="orderNumber" label="订单号" width="200" />
-          <el-table-column
-            prop="id"
-            label="事项"
-            align="center"
-            show-overflow-tooltip
-          >
-            <template #default="scope">
-              {{ formatEnum(scope.row.status, beeOrderStatus) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="amount" label="金额" width="100" />
-          <el-table-column prop="dateAdd" label="支付时间">
-            <template #default="scope">{{
-              formatDate(scope.row.dateAdd)
-            }}</template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </gva-card>
   </div>
 </template>
 
