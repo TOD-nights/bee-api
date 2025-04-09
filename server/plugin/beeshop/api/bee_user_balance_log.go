@@ -167,16 +167,16 @@ func (beeUserBalanceLogApi *BeeUserBalanceLogApi) GetBeeUserBalanceLogCount(c *g
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	shopUserId := int(utils.GetShopUserID(c))
-	userId := beeUtils.GetUserID(c) // 当前登录用户id
-	if sum, err := beeUserBalanceLogService.GetBeeUserBalanceLogInfoCount(pageInfo, shopUserId, userId); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
-		response.FailWithMessage("获取失败", c)
-	} else {
-		response.OkWithDetailed(response.Response{
-			Data: sum,
-		}, "获取成功", c)
-	}
+	//shopUserId := int(utils.GetShopUserID(c))
+	//userId := beeUtils.GetUserID(c) // 当前登录用户id
+	//if sum, err := beeUserBalanceLogService.GetBeeUserBalanceLogInfoCount(pageInfo, shopUserId, userId); err != nil {
+	//	global.GVA_LOG.Error("获取失败!", zap.Error(err))
+	//	response.FailWithMessage("获取失败", c)
+	//} else {
+	//	response.OkWithDetailed(response.Response{
+	//		Data: sum,
+	//	}, "获取成功", c)
+	//}
 }
 
 // GetBeeUserBalanceLogPublic 不需要鉴权的用户消费记录接口

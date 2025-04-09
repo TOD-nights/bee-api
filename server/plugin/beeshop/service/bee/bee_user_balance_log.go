@@ -7,6 +7,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee"
 	beeReq "github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type BeeUserBalanceLogService struct{}
@@ -143,35 +144,10 @@ func (beeUserBalanceLogService *BeeUserBalanceLogService) GetBeeUserBalanceLogIn
 	return beeUserBalanceLogs, total, err
 }
 
-func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(info beeReq.BeeUserBalanceLogSearch, shopUserId int, currentUserId uint) (float64, error) {
-	var userInfo system.SysUser
-	global.GVA_DB.Debug().Model(&userInfo).Preload("Authorities").First(&userInfo, currentUserId)
+func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(c *gin.Context, orderType string, info beeReq.BeeOrderSearch) (float64, float64) {
 
-	var adminFlag = false
-
-	roleIds := []uint{}
-	for _, role := range userInfo.Authorities {
-		roleIds = append(roleIds, role.AuthorityId)
-		if role.Admin == 1 {
-			adminFlag = true
-		}
-	}
-
-	var roles []system.SysAuthority
-	if err := global.GVA_DB.Model(&system.SysAuthority{}).Preload("ShopInfos").Find(&roles, roleIds).Error; err != nil {
-		return 0, err
-	}
-
-	var shopIds = []int{}
-	for _, role := range roles {
-		if len(role.ShopInfos) > 0 {
-			for _, shop := range role.ShopInfos {
-				shopIds = append(shopIds, int(*shop.Id))
-			}
-		}
-	}
 	var orderPrefix = ""
-	if info.Type == "payment" {
+	if orderType == "payment" {
 		orderPrefix = "pay_"
 	} else {
 		orderPrefix = "recharge_"
@@ -186,31 +162,27 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(info beeReq.Bee
 	//db = db.Where("log.user_id = ?", shopUserId)
 
 	// 根据 type 参数过滤记录
-	if info.Type == "payment" {
+	if orderType == "payment" {
 		db = db.Where("a.order_id like ?", "pay_%")
-	} else if info.Type == "recharge" {
+	} else if orderType == "recharge" {
 		db = db.Where("a.order_id like ?", "recharge_%")
 	}
-	if !adminFlag {
-		if len(shopIds) > 0 {
-			db = db.Where("log.shop_id in ?", shopIds)
+	if _, exist := c.Get("admin"); !exist {
+		if shopIds, exist := c.Get("shopIds"); exist {
+			db = db.Where("log.shop_id IN (?)", shopIds)
 		}
 	}
-	// 如果有条件搜索 下方会自动创建搜索语句
-	if info.Uid != nil {
-		db = db.Where("log.uid = ?", info.Uid)
-	}
+
 	if info.StartDateAdd != nil && info.EndDateAdd != nil {
 		db = db.Where("log.date_add BETWEEN ? AND ? ", info.StartDateAdd, info.EndDateAdd)
 	}
-
-	if info.ShopId > 0 {
-		db = db.Where("log.shop_id = ?", info.ShopId)
-	}
 	var sum float64
-	err := db.Select("ifnull(sum(money),0)").Scan(&sum).Error
-	if err != nil {
-		return 0, err
+	var sumSelected float64
+	if info.ShopId != nil && *info.ShopId > 0 {
+		tx := db.Where("log.shop_id = ?", info.ShopId)
+		tx.Select("ifnull(sum(money),0)").Scan(&sumSelected)
 	}
-	return sum, err
+
+	db.Select("ifnull(sum(money),0)").Scan(&sum)
+	return sum, sumSelected
 }

@@ -243,7 +243,12 @@ func (beeOrderService *BeeOrderService) OrderStatistic(c *gin.Context, info beeR
 		tx.Select("ifnull(sum(amount),0) amount").Scan(&todaySum)
 	}
 
-	return map[string]interface{}{"sum": sum, "count": count, "todaySum": todaySum, "todayCount": todayCount}, nil
+	ser := &BeeUserBalanceLogService{}
+	todayPayment, todayPaymentSelected := ser.GetBeeUserBalanceLogInfoCount(c, "payment", info)
+	todayRecharge, todayRechargeSelected := ser.GetBeeUserBalanceLogInfoCount(c, "recharage", info)
+	return map[string]interface{}{"sum": sum, "count": count, "todaySum": todaySum,
+		"todayRecharge": todayRecharge, "todayRechargeSelected": todayRechargeSelected,
+		"todayCount": todayCount, "todayPayment": todayPayment, "todayPaymentSelected": todayPaymentSelected}, nil
 }
 
 func (beeOrderService *BeeOrderService) ShippedBeeOrder(id int64, shopUserId int) error {
