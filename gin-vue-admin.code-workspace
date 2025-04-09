@@ -9,6 +9,10 @@
       "name": "frontend"
     },
     {
+      "path": "bee-api",
+      "name": "api"
+    },
+    {
       "path": ".",
       "name": "root"
     }
@@ -28,6 +32,13 @@
         "name": "Backend",
         "cwd": "${workspaceFolder:backend}",
         "program": "${workspaceFolder:backend}/"
+      },
+      {
+        "type": "go",
+        "request": "launch",
+        "name": "Api",
+        "cwd": "${workspaceFolder:api}",
+        "program": "${workspaceFolder:api}/"
       },
       {
         "type": "node",
