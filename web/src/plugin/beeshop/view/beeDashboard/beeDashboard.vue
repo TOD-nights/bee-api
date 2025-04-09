@@ -93,7 +93,7 @@
     :precision="2"
   >
     <template #title>
-      <div class="font-bold">今日全部商店充值和消费金额</div>
+      <div class="font-bold">今日全部商店消费金额</div>
     </template>
     <template #suffix>
       <span class="text-sm">元</span>
@@ -108,7 +108,7 @@
     :precision="2"
   >
     <template #title>
-      <div class="font-bold">今日选中商店充值和消费金额</div>
+      <div class="font-bold">今日选中商店消费金额</div>
     </template>
     <template #suffix>
       <span class="text-sm">元</span>
