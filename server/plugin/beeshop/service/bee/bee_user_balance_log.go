@@ -156,7 +156,7 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(c *gin.Context,
 	// 创建db
 	// 修改查询逻辑，使用 LEFT JOIN 而不是 INNER JOIN
 	db := global.GVA_DB.Session(&gorm.Session{}).Debug().Table(bee.BeePayLog{}.TableName() + " as log ").
-		Joins("left join bee_user_balance_log a on concat('" + orderPrefix + "',log.order_no) = a.order_id").
+		Joins("inner join bee_user_balance_log a on concat('" + orderPrefix + "',log.order_no) = a.order_id").
 		Joins("left join bee_shop_info b on log.shop_id = b.id")
 
 	// 基础条件
