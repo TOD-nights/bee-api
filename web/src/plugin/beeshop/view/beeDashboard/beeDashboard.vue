@@ -275,129 +275,19 @@ const orderStatisticHandler = async()=>{
     todayOrderCount.value = orderStatisticRes.data.data.count || 0;
     todayAmountSelect.value = orderStatisticRes.data.data.todaySum || 0;
     todayOrderCountSelect.value = orderStatisticRes.data.data.todayCount || 0;
+    todayRechargeTotal.value = orderStatisticRes.data.data.todayRecharge || 0;
+    todayRechargeSelect.value = orderStatisticRes.data.data.todayRechargeSelected || 0;
+    todayPaymentTotal.value = orderStatisticRes.data.data.todayPayment || 0;
+    todayPaymentSelect.value = orderStatisticRes.data.data.todayPaymentSelected || 0;
   }
 }
 const shopIdChangeHandler = (v)=>{
   console.log(v, "shopIdChangeHandler");
 }
-
-
-// 获取今日余额变动数据，区分充值和支付
-const getTodayBalanceLog = async () => {
-  const today = dayjs().startOf('day').toDate();
-  const tonight = dayjs().endOf('day').toDate();
-  
-  const balanceLog = await getBeeUserBalanceLogList({
-    page: 1,
-    pageSize: 1000,
-    startDateAdd: today,
-    endDateAdd: tonight
-  });
-// 分别获取充值和支付记录
-const rechargeLog = await getBeeUserBalanceLogCount({
-    page: 1,
-    pageSize: 1000,
-    startDateAdd: today,
-    endDateAdd: tonight,
-    type: 'recharge'  // 获取充值记录
-  });
-
-  getBeeUserBalanceLogCount({
-    startDateAdd: today,
-    endDateAdd: tonight,
-    type: 'recharge',  // 获取充值记录
-    shopId: shopId.value
-  }).then(res=>{
-    console.log(res,'----')
-    if(res.code == 0){
-     
-      todayRechargeSelect.value = res.data.data
-    }
-  }).catch(err=>{
-    console.log(err,'err')
-  })
-
-  const paymentLog = await getBeeUserBalanceLogList({
-    page: 1,
-    pageSize: 1000,
-    startDateAdd: today,
-    endDateAdd: tonight,
-    type: 'payment'  // 获取支付记录
-  });
-
-  if (rechargeLog.code === 0) {
-    console.log(rechargeLog,rechargeLog.data.data)
-
-    todayRechargeTotal.value = rechargeLog.data.data;
-  }
-
-  if (paymentLog.code === 0) {
-    todayPaymentTotal.value = Math.abs(paymentLog.data.list.reduce((sum, item) => sum + Number(item.num), 0));
-  }
-  
-  if (balanceLog.code === 0) {
-    // 分别计算充值和支付金额
-    const rechargeList = balanceLog.data.list.filter(item => item.mark === '充值');
-    const paymentList = balanceLog.data.list.filter(item => item.mark === '订单支付');
-    
-    // todayRechargeTotal.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
-    // todayPaymentTotal.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
-  }
-};
-// 获取选中商店的余额变动数据，区分充值和支付
-const getTodayBalanceLogSelect = async () => {
-  const today = dayjs().startOf('day').toDate();
-  const tonight = dayjs().endOf('day').toDate();
-  
-   // 打印 API 请求参数
-   console.log('API 请求参数:', {
-    page: 1,
-    pageSize: 1000,
-    startDateAdd: today,
-    endDateAdd: tonight,
-    shopId: shopId.value
-    
-  });
-
-
-  const balanceLog = await getBeeUserBalanceLogList({
-    page: 1,
-    pageSize: 1000,
-    startDateAdd: today,
-    endDateAdd: tonight,
-    shopId: shopId.value
-  });
-  console.log('API 返回的完整响应:', balanceLog); // 查看完整响应
-  console.log('余额变动数据:', balanceLog.data.list);
-  
-  if (balanceLog.code === 0) {
-      // 检查所有不同类型的 mark
-      const uniqueMarks = [...new Set(balanceLog.data.list.map(item => item.mark))];
-    console.log('所有 mark 类型:', uniqueMarks);
-
-    const rechargeList = balanceLog.data.list.filter(item => item.mark === '充值');
-    const paymentList = balanceLog.data.list.filter(item => item.mark === '订单支付');
-    
-    console.log('充值记录:', rechargeList);
-    console.log('支付记录:', paymentList);
-
-    
-   
-    // todayRechargeSelect.value = rechargeList.reduce((sum, item) => sum + Number(item.num), 0);
-    todayPaymentSelect.value = Math.abs(paymentList.reduce((sum, item) => sum + Number(item.num), 0));
-
-    console.log('计算后的充值金额:', todayRechargeSelect.value);
-    console.log('计算后的支付金额:', todayPaymentSelect.value);
-  }
-};
-
 // 修改 watch 监听器
 watch(shopId, async (newVal) => {
   if (newVal) {  // 只有当有选择值时才调用
-    await getTodayAmountSelect();
-    await getTodayOrderCountSelect();
-    await getTodayBalanceLogSelect();
-    await getTodayBalanceLog();
+    await orderStatisticHandler();
   } else {
     todayAmountSelect.value = 0; // 没有选择时清零
     todayOrderCountSelect.value = 0;
@@ -410,8 +300,6 @@ watch(shopId, async (newVal) => {
 
 const init = async () => {
   await orderStatisticHandler();
-  await getTodayBalanceLog();
-  await getTodayBalanceLogSelect();
 
   beeOrderStatus.value = await getDictFunc("OrderStatus");
   
