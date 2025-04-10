@@ -238,7 +238,7 @@ func (beeOrderService *BeeOrderService) OrderStatistic(c *gin.Context, info beeR
 	db.Select("ifnull(sum(amount),0) amount").Scan(&sum)
 
 	if info.ShopId != nil && *info.ShopId > 0 {
-		tx := db.Where("shop_id = ?", info.ShopId)
+		tx := db.Session(&gorm.Session{}).Where("shop_id = ?", info.ShopId)
 		tx.Count(&todayCount)
 		tx.Select("ifnull(sum(amount),0) amount").Scan(&todaySum)
 	}

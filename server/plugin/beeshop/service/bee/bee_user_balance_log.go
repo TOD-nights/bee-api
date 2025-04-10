@@ -8,6 +8,7 @@ import (
 	beeReq "github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type BeeUserBalanceLogService struct{}
@@ -154,7 +155,7 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(c *gin.Context,
 	}
 	// 创建db
 	// 修改查询逻辑，使用 LEFT JOIN 而不是 INNER JOIN
-	db := GetBeeDB().Debug().Table(bee.BeePayLog{}.TableName() + " as log ").
+	db := global.GVA_DB.Session(&gorm.Session{}).Debug().Table(bee.BeePayLog{}.TableName() + " as log ").
 		Joins("left join bee_user_balance_log a on concat('" + orderPrefix + "',log.order_no) = a.order_id").
 		Joins("left join bee_shop_info b on log.shop_id = b.id")
 
@@ -169,7 +170,7 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(c *gin.Context,
 	}
 	if _, exist := c.Get("admin"); !exist {
 		if shopIds, exist := c.Get("shopIds"); exist {
-			db = db.Where("log.shop_id IN (?)", shopIds)
+			db = db.Where("log.shop_id IN ?", shopIds)
 		}
 	}
 
@@ -179,7 +180,7 @@ func (s *BeeUserBalanceLogService) GetBeeUserBalanceLogInfoCount(c *gin.Context,
 	var sum float64
 	var sumSelected float64
 	if info.ShopId != nil && *info.ShopId > 0 {
-		tx := db.Where("log.shop_id = ?", info.ShopId)
+		tx := db.Session(&gorm.Session{}).Where("log.shop_id = ?", info.ShopId)
 		tx.Select("ifnull(sum(money),0)").Scan(&sumSelected)
 	}
 
