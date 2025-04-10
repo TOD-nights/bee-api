@@ -131,6 +131,9 @@
             <el-form-item label="用户id:"  prop="uid" >
               <el-input v-model.number="formData.uid" :clearable="true" placeholder="请输入用户id" />
             </el-form-item>
+            <el-form-item label="发放数量:"  prop="batch" v-show="type == 'create'">
+              <el-input v-model.number="formData.batch" :clearable="true" placeholder="请输入发放数量" />
+            </el-form-item>
             <el-form-item label="可以使用时间:"  prop="dateStart" >
               <el-date-picker v-model="formData.dateStart" type="date" style="width:100%" placeholder="选择日期" :clearable="true"  />
             </el-form-item>
@@ -208,6 +211,7 @@ const formData = ref({
         dateUpdate: new Date(),
         dateDelete: undefined,
         uid: undefined,
+        batch: 1,
         dateStart: new Date(),
         expiryMillis: undefined,
         money: 0,
@@ -448,6 +452,7 @@ const enterDialog = async () => {
                   res = await createBeeUserCoupon(formData.value)
                   break
               }
+             console.log(formData.value)
               if (res.code === 0) {
                 ElMessage({
                   type: 'success',

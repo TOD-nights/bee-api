@@ -8,6 +8,9 @@
         <el-form-item label="商店用户ID:" prop="userId">
           <el-input v-model.number="formData.userId" :clearable="true" placeholder="请输入" />
        </el-form-item>
+        <el-form-item label="发放数量:" prop="batch">
+          <el-input v-model.number="formData.batch" :clearable="true" placeholder="请输入" />
+        </el-form-item>
         <el-form-item label="已删除:" prop="isDeleted">
           <el-switch v-model="formData.isDeleted" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>
        </el-form-item>

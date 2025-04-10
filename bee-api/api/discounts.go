@@ -5,6 +5,8 @@ import (
 	"gitee.com/stuinfer/bee-api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"strconv"
+	"strings"
 )
 
 type DiscountsApi struct {
@@ -23,8 +25,17 @@ func (api DiscountsApi) Statistics(c *gin.Context) {
 
 func (api DiscountsApi) My(c *gin.Context) {
 	userInfo := api.GetUserInfo(c)
-	status := cast.ToInt(c.Query("status"))
-	data, err := service.GetCouponSrv().GetMyCouponListByStatus(userInfo.Id, enum.CouponStatus(status))
+	status := c.Query("status")
+	var statusEnum []enum.CouponStatus
+	for _, s := range strings.Split(status, ",") {
+		atoi, err := strconv.Atoi(s)
+		if err != nil {
+			api.Fail(c, enum.ResCodeFail, err.Error())
+			return
+		}
+		statusEnum = append(statusEnum, enum.CouponStatus(atoi))
+	}
+	data, err := service.GetCouponSrv().GetMyCouponListByStatus(userInfo.Id, statusEnum)
 	if err != nil {
 		api.Fail(c, enum.ResCodeFail, err.Error())
 		return

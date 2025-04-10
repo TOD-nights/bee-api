@@ -9,6 +9,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"strconv"
 )
 
 type BeeUserCouponApi struct{}
@@ -26,6 +27,11 @@ var beeUserCouponService = service.ServiceGroupApp.BeeServiceGroup.BeeUserCoupon
 // @Router /beeUserCoupon/createBeeUserCoupon [post]
 func (beeUserCouponApi *BeeUserCouponApi) CreateBeeUserCoupon(c *gin.Context) {
 	var beeUserCoupon bee.BeeUserCoupon
+	batch := c.Query("batch")
+	if batch == "" {
+		batch = "1"
+	}
+	batchNum, _ := strconv.Atoi(batch)
 	err := c.ShouldBindJSON(&beeUserCoupon)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -33,7 +39,7 @@ func (beeUserCouponApi *BeeUserCouponApi) CreateBeeUserCoupon(c *gin.Context) {
 	}
 	shopUserId := int(utils.GetShopUserID(c))
 	beeUserCoupon.UserId = &shopUserId
-	if err := beeUserCouponService.CreateBeeUserCoupon(&beeUserCoupon); err != nil {
+	if err := beeUserCouponService.CreateBeeUserCoupon(&beeUserCoupon, batchNum); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {

@@ -97,6 +97,8 @@ const router = useRouter()
 const type = ref('')
 const formData = ref({
             id: undefined,
+            batch: 1,
+            userIds: [],
             userId: undefined,
             isDeleted: false,
             dateAdd: new Date(),

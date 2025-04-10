@@ -11,6 +11,8 @@ import (
 	"gitee.com/stuinfer/bee-api/proto"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -29,10 +31,14 @@ func GetCouponSrv() *CouponSrv {
 	return couponSrvInstance
 }
 
-func (srv *CouponSrv) GetMyCouponListByStatus(userId int64, status enum.CouponStatus) ([]*model.BeeUserCoupon, error) {
+func (srv *CouponSrv) GetMyCouponListByStatus(userId int64, status []enum.CouponStatus) ([]*model.BeeUserCoupon, error) {
 	//@todo 分页
 	var list []*model.BeeUserCoupon
-	err := db.GetDB().Where("uid =? and status=? and is_deleted = 0", userId, status).Find(&list).Error
+	var statusStr []string
+	for _, s := range status {
+		statusStr = append(statusStr, strconv.Itoa(int(s)))
+	}
+	err := db.GetDB().Where("uid =? and status in (?) and is_deleted = 0", userId, strings.Join(statusStr, ",")).Find(&list).Error
 	return list, err
 }
 
