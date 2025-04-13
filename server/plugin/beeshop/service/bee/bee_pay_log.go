@@ -65,7 +65,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(c *gin.Context, i
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&dto.BeePayLogInfoDto{}).Joins(" left join bee_order a on a.order_number = bee_pay_log.order_number left join bee_shop_info b on b.id = a.shop_id")
+	db := global.GVA_DB.Model(&dto.BeePayLogInfoDto{}).Joins(" left join bee_order a on a.order_number = bee_pay_log.order_number left join bee_shop_info b on( b.id = a.shop_id or bee_pay_log.shop_id = b.id)")
 	db = db.Where("bee_pay_log.user_id = ?", shopUserId)
 	var beePayLogs []dto.BeePayLogInfoDto
 	// 如果有条件搜索 下方会自动创建搜索语句
