@@ -404,9 +404,9 @@ func (s *OrderSrv) CreateOrder(c context.Context, ip string, req *proto.CreateOr
 				moneyCal = couponInfo.Money
 			} else if couponInfo.MoneyType == enum.CouponMoneyTypeRatio {
 				if couponInfo.OnlyFreight {
-					moneyCal = amountLogistics.Mul(couponInfo.Money)
+					moneyCal = amountLogistics.Mul(couponInfo.Money).Round(2)
 				} else {
-					moneyCal = payTotal.Mul(couponInfo.Money)
+					moneyCal = payTotal.Mul(couponInfo.Money).Round(2)
 				}
 
 				if moneyCal.LessThan(couponInfo.MoneyMin) && !couponInfo.MoneyMin.Equal(decimal.Zero) {
