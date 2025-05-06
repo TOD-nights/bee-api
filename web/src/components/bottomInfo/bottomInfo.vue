@@ -23,7 +23,7 @@
       </span>
     </div>
 
-    <slot />
+  
     <div class="text-center">
       <span class="mr-1">Copyright</span>
       <span>
