@@ -4,7 +4,7 @@
     class="w-full h-full relative"
   >
     <div
-      class="rounded-lg flex items-center justify-evenly w-full h-full md:w-screen md:h-screen md:bg-[#194bfb]"
+      class="rounded-lg flex items-center justify-evenly w-full h-full md:w-screen md:h-screen md:bg-[#FDD835]"
     >
       <div class="md:w-3/5 w-10/12 h-full flex items-center justify-evenly">
         <div class="oblique h-[130%] w-3/5 bg-white dark:bg-slate-900 transform -rotate-12 absolute -ml-52" />
@@ -98,7 +98,7 @@
           </div>
         </div>
       </div>
-      <div class="hidden md:block w-1/2 h-full float-right bg-[#194bfb]"><img
+      <div class="hidden md:block w-1/2 h-full float-right bg-[#FDD835]"><img
         class="h-full"
         src="@/assets/login_right_banner.jpg"
         alt="banner"

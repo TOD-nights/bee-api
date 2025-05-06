@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg  flex items-center justify-evenly w-full h-full relative md:w-screen md:h-screen md:bg-[#194bfb] overflow-hidden">
+  <div class="rounded-lg  flex items-center justify-evenly w-full h-full relative md:w-screen md:h-screen md:bg-[#FDD835] overflow-hidden">
     <div class="rounded-md w-full h-full flex items-center justify-center overflow-hidden">
       <div class="oblique h-[130%] w-3/5 bg-white dark:bg-slate-900 transform -rotate-12 absolute -ml-80" />
       <div
@@ -151,7 +151,7 @@
       </div>
     </div>
 
-    <div class="hidden md:block w-1/2 h-full float-right bg-[#194bfb]"><img
+    <div class="hidden md:block w-1/2 h-full float-right bg-[#FDD835]"><img
       class="h-full"
       src="@/assets/login_right_banner.jpg"
       alt="banner"
