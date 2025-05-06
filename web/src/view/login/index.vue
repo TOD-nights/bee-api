@@ -4,7 +4,7 @@
     class="w-full h-full relative"
   >
     <div
-      class="rounded-lg flex items-center justify-evenly w-full h-full md:w-screen md:h-screen md:bg-[#FDD835]"
+      class="rounded-lg flex items-center justify-evenly w-full h-full md:w-screen md:h-screen md:bg-[#194bfb]"
     >
       <div class="md:w-3/5 w-10/12 h-full flex items-center justify-evenly">
         <div class="oblique h-[130%] w-3/5 bg-white dark:bg-slate-900 transform -rotate-12 absolute -ml-52" />
@@ -21,7 +21,7 @@
             </div>
             <div class="mb-9">
               <p class="text-center text-4xl font-bold">{{ $GIN_VUE_ADMIN.appName }}</p>
-              <p class="text-center text-sm font-normal text-gray-500 mt-2.5">A management platform using Golang and Vue
+              <p class="text-center text-sm font-normal text-gray-500 mt-2.5">咖啡初体验
               </p>
             </div>
             <el-form
@@ -98,7 +98,7 @@
           </div>
         </div>
       </div>
-      <div class="hidden md:block w-1/2 h-full float-right bg-[#FDD835]"><img
+      <div class="hidden md:block w-1/2 h-full float-right bg-[#194bfb]"><img
         class="h-full"
         src="@/assets/login_right_banner.jpg"
         alt="banner"
