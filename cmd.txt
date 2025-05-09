@@ -1,3 +1,22 @@
+后端服务
+编译
+cd /root/bee-api/server && go build -o server main.go
+cd /root/bee-api/bee-api && go build -o beeapi main.go
+启动
+systemctl start bee-server
+systemctl start bee-api
+停止
+systemctl stop bee-server
+systemctl stop bee-api
+重启
+systemctl restart bee-server
+systemctl restart bee-api
+查看状态
+systemctl status bee-server
+systemctl status bee-api
+
+后端服务挂掉会自动重启3次 如果都失败了不再重试
+
 
 更新并重启后端服务：
 
