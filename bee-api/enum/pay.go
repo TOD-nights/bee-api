@@ -24,7 +24,8 @@ const (
 	PayGateWXAPP   PayGate = "WXAPP"
 	PayGateBalance PayGate = "余额"
 
-	PayNextActionTypeRecharge  PayNextActionType = -1 // 充值，nextAction 没有值
-	PayNextActionTypePayOrder  PayNextActionType = 0  // 支付订单， { type: 0, id: orderId}
-	PayNextActionTypePayDirect PayNextActionType = 4  // 优惠买单 {type: 4, uid: wx.getStorageSync('uid'), money: data.money}
+	PayNextActionTypeRecharge   PayNextActionType = -1 // 充值，nextAction 没有值
+	PayNextActionTypePayOrder   PayNextActionType = 0  // 支付订单， { type: 0, id: orderId}
+	PayNextActionTypePayDirect  PayNextActionType = 4  // 优惠买单 {type: 4, uid: wx.getStorageSync('uid'), money: data.money}
+	PayNextActionTypeMemberCard PayNextActionType = 8  // 购买会员卡 {type: 8, uid: wx.getStorageSync('uid'), money: data.money}
 )

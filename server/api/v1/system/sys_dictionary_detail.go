@@ -146,3 +146,16 @@ func (s *DictionaryDetailApi) GetSysDictionaryDetailList(c *gin.Context) {
 		PageSize: pageInfo.PageSize,
 	}, "获取成功", c)
 }
+
+// 根据字典type 查询 详细列表
+func (s *DictionaryDetailApi) GetDictDetailList(c *gin.Context) {
+
+	dicttype := c.Query("type")
+	if list, err := dictionaryDetailService.GetDictionaryListByDictType(dicttype); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	} else {
+		response.OkWithDetailed(list, "查询成功", c)
+	}
+}

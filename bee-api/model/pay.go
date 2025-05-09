@@ -20,6 +20,8 @@ type BeePayLog struct {
 	StatusStr    string            `gorm:"-" json:"statusStr"`
 	Uid          int64             `gorm:"column:uid;type:bigint(11);comment:用户id" json:"uid"`
 	ShopId       int64             `gorm:"column:shop_id;type:bigint(11);comment:所属门店" json:"shopId"`
+	OrderType    int32             `gorm:"column:order_type;type:int(11);comment:订单类型,默认值0   0消费订单   1会员卡订单" json:"orderType"`
+	MemberCardId int64             `gorm:"column:member_card_id;type:bigint(11);comment:会员卡id,默认值0 " json:"memberCardId"`
 }
 
 func (b *BeePayLog) TableName() string {

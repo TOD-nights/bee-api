@@ -64,7 +64,7 @@ db-list:
       password: PASS
       path: "47.98.186.186"
       engine: ""
-      log-mode: error
+      log-mode: info
       max-idle-conns: 10
       max-open-conns: 100
       singular: false

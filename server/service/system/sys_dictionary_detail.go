@@ -114,3 +114,10 @@ func (dictionaryDetailService *DictionaryDetailService) GetDictionaryInfoByTypeV
 	err = db.First(&sysDictionaryDetails, "sys_dictionaries.type = ? and sys_dictionary_details.value = ?", t, value).Error
 	return sysDictionaryDetails, err
 }
+
+func (dictionaryDetailService *DictionaryDetailService) GetDictionaryListByDictType(dicttype string) ([]system.SysDictionaryDetail, error) {
+	var sysDictionaryDetails []system.SysDictionaryDetail
+	db := global.GVA_DB.Model(&system.SysDictionaryDetail{}).Joins("JOIN sys_dictionaries ON sys_dictionaries.id = sys_dictionary_details.sys_dictionary_id")
+	err := db.Find(&sysDictionaryDetails, "sys_dictionaries.type = ? ", dicttype).Error
+	return sysDictionaryDetails, err
+}

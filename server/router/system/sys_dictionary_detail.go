@@ -20,5 +20,6 @@ func (s *DictionaryDetailRouter) InitSysDictionaryDetailRouter(Router *gin.Route
 	{
 		dictionaryDetailRouterWithoutRecord.GET("findSysDictionaryDetail", sysDictionaryDetailApi.FindSysDictionaryDetail)       // 根据ID获取SysDictionaryDetail
 		dictionaryDetailRouterWithoutRecord.GET("getSysDictionaryDetailList", sysDictionaryDetailApi.GetSysDictionaryDetailList) // 获取SysDictionaryDetail列表
+		dictionaryDetailRouterWithoutRecord.GET("getDictDetailList", sysDictionaryDetailApi.GetDictDetailList)                   // GetDictDetailList
 	}
 }

@@ -78,3 +78,12 @@ export const getSysDictionaryDetailList = (params) => {
     params
   })
 }
+
+
+
+export const getDictDetailList = (typeValue) => {
+  return service({
+    url: '/sysDictionaryDetail/getDictDetailList?type='+typeValue,
+    method: 'get',
+  })
+}

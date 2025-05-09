@@ -926,6 +926,7 @@ func (s *OrderSrv) PayOrderOffline(c context.Context, orderId string, extraTx ..
 		Remark:     "",
 		Status:     enum.PayLogStatusUnPaid,
 		Uid:        orderInfo.Uid,
+		OrderType:  0,
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err
@@ -1115,6 +1116,7 @@ func (s *OrderSrv) PayByBalance(c context.Context, ip, orderId string, code stri
 		Remark:     "",
 		Status:     enum.PayLogStatusUnPaid,
 		Uid:        kit.GetUid(c),
+		OrderType:  0,
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err
@@ -1153,6 +1155,7 @@ func (s *OrderSrv) PayByBalance_1(c context.Context, ip, orderId string) error {
 		Status:      enum.PayLogStatusUnPaid,
 		Uid:         kit.GetUid(c),
 		ShopId:      orderInfo.ShopId,
+		OrderType:   0,
 	}
 	if err = db.GetDB().Create(payLog).Error; err != nil {
 		return err

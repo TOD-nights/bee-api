@@ -309,5 +309,14 @@ func NewRouter() *gin.Engine {
 		queuingGroup.GET("/my", CheckToken(), (api.QueuingApi{}).My)
 	}
 
+	// 会员卡
+	memberCardGroup := domainGroup.Group("/member-card")
+	{
+		memberCardGroup.GET("/listall", CheckToken(), api.MemberCardController.ListAll)
+		memberCardGroup.POST("/buy/balance_pay", CheckToken(), api.UserMemberCardController.BalancePay)
+		memberCardGroup.POST("/buy/wxpay", CheckToken(), api.UserMemberCardController.WxPay)
+		memberCardGroup.GET("/my-member-card", CheckToken(), api.UserMemberCardController.MyMemberCard)
+	}
+
 	return router
 }

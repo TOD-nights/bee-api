@@ -167,6 +167,11 @@ func (fee *PaySrv) dealPayNotify(c context.Context, ip string, payResult *wechat
 			if updateLogRes.RowsAffected != 1 {
 				return errors.New("操作冲突")
 			}
+
+			//支付成功,如果是购买会员卡,自动发放优惠卷
+			if payLog.MemberCardId > 0 {
+				GetCouponSrv().CreateMemberCardCoupon(context.Background(), payLog.MemberCardId, payLog.Uid)
+			}
 			return nil
 		})
 	case enum.PayNextActionTypePayOrder:
@@ -295,7 +300,7 @@ func (fee *PaySrv) GetWechatPayClient(ctx context.Context, cfg *WxPayConfig) (*w
 	return wechatClient, nil
 }
 
-func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, remark string, nextAction string, name string, shopId int64) (*proto.GetWxPayInfoRes, error) {
+func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, remark string, nextAction string, name string, shopId int64, memberCardID int) (*proto.GetWxPayInfoRes, error) {
 	// 获取配置
 	type payAction struct {
 		Type int32 `json:"type"`
@@ -372,16 +377,18 @@ func (fee *PaySrv) GetWxAppPayInfo(c context.Context, money decimal.Decimal, rem
 		return nil, errors.New("微信请求失败：" + wxResp.Error)
 	}
 	beePayLog := &model.BeePayLog{
-		BaseModel:   *kit.GetInsertBaseModel(c),
-		Money:       money,
-		NextAction:  nextAction,
-		OrderNo:     payOrderId,
-		PayGate:     enum.PayGateWXAPP,
-		Remark:      "",
-		ShopId:      shopId,
-		Status:      enum.PayLogStatusUnPaid,
-		Uid:         kit.GetUid(c),
-		OrderNumber: outTradeNo,
+		BaseModel:    *kit.GetInsertBaseModel(c),
+		Money:        money,
+		NextAction:   nextAction,
+		OrderNo:      payOrderId,
+		PayGate:      enum.PayGateWXAPP,
+		Remark:       "",
+		ShopId:       shopId,
+		Status:       enum.PayLogStatusUnPaid,
+		Uid:          kit.GetUid(c),
+		OrderNumber:  outTradeNo,
+		OrderType:    0,
+		MemberCardId: int64(memberCardID),
 	}
 	err = db.GetDB().Create(beePayLog).Error
 	if err != nil {

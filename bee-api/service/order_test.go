@@ -223,6 +223,7 @@ func TestOrderSrv_PayOrder(t *testing.T) {
 			Status:     0,
 			StatusStr:  "",
 			Uid:        kit.GetUid(ctx),
+			OrderType:  0,
 		}
 		db.GetDB().Create(payLog)
 		err = srv.PayOrderByBalance(ctx, "ip", payLog, cast.ToString(resp.Id), util.GetRandInt64(), resp.AmountReal)

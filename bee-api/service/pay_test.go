@@ -91,6 +91,7 @@ func TestPaySrv_dealPayNotify(t *testing.T) {
 			Remark:     "",
 			Status:     enum.PayLogStatusUnPaid,
 			Uid:        kit.GetUid(ctx),
+			OrderType:  0,
 		}
 		err := db.GetDB().Create(beePayLog).Error
 		So(err, ShouldBeNil)

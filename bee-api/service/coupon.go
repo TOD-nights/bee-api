@@ -10,6 +10,7 @@ import (
 	"gitee.com/stuinfer/bee-api/model"
 	"gitee.com/stuinfer/bee-api/proto"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"strconv"
 	"strings"
@@ -38,7 +39,7 @@ func (srv *CouponSrv) GetMyCouponListByStatus(userId int64, status []enum.Coupon
 	for _, s := range status {
 		statusStr = append(statusStr, strconv.Itoa(int(s)))
 	}
-	err := db.GetDB().Where("uid =? and status in (?) and is_deleted = 0", userId, strings.Join(statusStr, ",")).Find(&list).Error
+	err := db.GetDB().Debug().Where("uid =? and status in (?) and is_deleted = 0", userId, strings.Join(statusStr, ",")).Find(&list).Error
 	return list, err
 }
 
@@ -248,4 +249,74 @@ func (srv *CouponSrv) CouponDetail(c context.Context, id int64) (*proto.CouponDe
 		return nil, err
 	}
 	return &proto.CouponDetailResp{Info: &couponDetail}, nil
+}
+
+// creatememberCardCoupon 根据会员卡创建优惠卷
+func (srv *CouponSrv) CreateMemberCardCoupon(c context.Context, memberCardId int64, uid int64) error {
+
+	var memberCard model.BeeMemberCard
+	if err := db.GetDB().Model(&model.BeeMemberCard{}).First(&memberCard, memberCardId).Error; err != nil {
+		return err
+	}
+
+	var targetTime = memberCard.CreateTime.AddDate(0, int(memberCard.ValidMonth), 0)
+	var days = int(targetTime.Sub(memberCard.CreateTime).Hours() / 24)
+	// 每天创建一个优惠卷
+	coupon := model.BeeCoupon{
+
+		BaseModel: common.BaseModel{
+			UserId:     100,
+			IsDeleted:  false,
+			DateAdd:    common.JsonTime(time.Now()),
+			DateUpdate: common.JsonTime(time.Now()),
+		},
+		BatchSendUid:    -1,
+		DateEndDays:     int(days),
+		DateEndType:     1,
+		DateStartDays:   1,
+		DateStartType:   2, //次日生效
+		MoneyHreshold:   decimal.NewFromFloat(9.9),
+		MoneyMax:        decimal.NewFromFloat(9.9),
+		MoneyMin:        decimal.NewFromFloat(9.9),
+		Money:           decimal.NewFromFloat(9.9),
+		MoneyType:       2,
+		Name:            memberCard.Name + "优惠卷",
+		NeedAmount:      decimal.NewFromFloat(0),
+		NeedScore:       decimal.NewFromFloat(0),
+		NumberLeft:      0,
+		NumberPersonMax: int64(days),
+		NumberTotle:     int64(days),
+		NumberUsed:      int64(days),
+		ShowInFront:     true,
+		Status:          0,
+	}
+	if err := db.GetDB().Create(&coupon).Error; err != nil {
+		return err
+	}
+	var userCoupons []model.BeeUserCoupon
+	// 自动给用户分配优惠卷
+	for i := 0; i < days; i++ {
+		startTime := time.Now().AddDate(0, 0, i+1)
+		startTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, time.UTC)
+		var userCoupon = model.BeeUserCoupon{
+			BaseModel: common.BaseModel{
+				UserId:     100,
+				IsDeleted:  false,
+				DateAdd:    common.JsonTime(time.Now()),
+				DateUpdate: common.JsonTime(time.Now()),
+			},
+			Uid:          uid,
+			DateStart:    common.JsonTime(startTime),
+			ExpiryMillis: startTime.AddDate(0, 0, 1).UnixMilli(),
+			Money:        coupon.Money,
+			MoneyType:    0,
+			Name:         "会员卡优惠卷",
+			Pid:          coupon.Id,
+			Source:       "购买会员卡批量发放",
+			Status:       0,
+		}
+		userCoupons = append(userCoupons, userCoupon)
+	}
+
+	return db.GetDB().Create(userCoupons).Error
 }

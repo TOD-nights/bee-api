@@ -29,12 +29,16 @@ func (api PayApi) WxApp(c *gin.Context) {
 	remark := c.PostForm("remark")
 	nextAction := c.PostForm("nextAction") // {"type":4,"uid":6803950,"money":"123"}, 充值的时候为空
 	payName := c.PostForm("payName")
+	memberCardId, err := strconv.Atoi(c.PostForm("memberCardId"))
+	if err != nil {
+		memberCardId = 0
+	}
 	shopId, err := strconv.Atoi(c.PostForm("shopId"))
 	if err != nil {
 		shopId = 0
 	}
 
-	res, err := service.GetPaySrv().GetWxAppPayInfo(c, money, remark, nextAction, payName, int64(shopId))
+	res, err := service.GetPaySrv().GetWxAppPayInfo(c, money, remark, nextAction, payName, int64(shopId), memberCardId)
 	api.Res(c, res, err)
 
 }

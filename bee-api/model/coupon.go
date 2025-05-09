@@ -67,7 +67,7 @@ type BeeCoupon struct {
 	MoneyMax             decimal.Decimal        `gorm:"column:money_max;type:decimal(20,2);comment:优惠券最大金额" json:"moneyMax"`
 	MoneyMin             decimal.Decimal        `gorm:"column:money_min;type:decimal(20,2);comment:优惠券最小金额" json:"moneyMin"`
 	Money                decimal.Decimal        `gorm:"column:money;type:decimal(20,2);comment:优惠券金额/优惠券折扣系数" json:"money"`
-	MoneyType            enum.CouponMoneyType   `gorm:"column:money_type;type:bigint(11);comment:类型，1满xx，2折扣" json:"moneyType"`
+	MoneyType            enum.CouponMoneyType   `gorm:"column:money_type;type:bigint(11);comment:类型，1满xx，2折扣  3完全抵扣" json:"moneyType"`
 	Name                 string                 `gorm:"column:name;type:varchar(100);comment:优惠券名字" json:"name"`
 	NeedAmount           decimal.Decimal        `gorm:"column:need_amount;type:decimal(20,2);comment:需要支付" json:"needAmount"`
 	NeedScore            decimal.Decimal        `gorm:"column:need_score;type:decimal(20,2);comment:需要积分" json:"needScore"`
@@ -85,6 +85,7 @@ type BeeCoupon struct {
 	ShowInFront          bool                   `gorm:"column:show_in_front;type:tinyint(1);comment:展示" json:"showInFront"`
 	Status               int64                  `gorm:"column:status;type:bigint(11);comment:状态，0是正常" json:"status"`
 	Type                 string                 `gorm:"column:type;type:varchar(100);comment:优惠券类型描述" json:"type"`
+	ProdId               int64                  `gorm:"column:prod_id;type:bigint(11);comment:关联产品id" json:"prodId"`
 }
 
 func (m *BeeCoupon) TableName() string {
