@@ -13,7 +13,7 @@
 
         </el-form-item>
         <el-form-item label="会员" prop="vipLevel">
-         <el-input v-model="searchInfo.vipLevel" placeholder="搜索条件" />
+         <el-input v-model.number="searchInfo.vipLevel" placeholder="搜索条件" />
 
         </el-form-item>
 
