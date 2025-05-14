@@ -12,10 +12,12 @@
              <el-input v-model.number="searchInfo.showUid" placeholder="搜索条件" />
 
         </el-form-item>
-        <el-form-item label="会员卡号" prop="cardNumber">
-         <el-input v-model="searchInfo.cardNumber" placeholder="搜索条件" />
+        <el-form-item label="会员" prop="vipLevel">
+         <el-input v-model="searchInfo.vipLevel" placeholder="搜索条件" />
 
         </el-form-item>
+
+          <!-- 将需要控制显示状态的查询条件添加到此范围内 
             <el-form-item label="是否虚拟人" prop="isVirtual">
             <el-select v-model="searchInfo.isVirtual" clearable placeholder="请选择">
                 <el-option
@@ -29,7 +31,7 @@
                     value="false">
                 </el-option>
             </el-select>
-            </el-form-item>
+            </el-form-item>-->
         <el-form-item label="状态" prop="status">
             
              <el-input v-model.number="searchInfo.status" placeholder="搜索条件" />
@@ -65,7 +67,7 @@
         <el-table-column type="selection" width="55" />
         
         <el-table-column sortable align="left" label="id字段" prop="id" width="120" />
-        <el-table-column align="left" label="用户show_id" prop="showUid" width="120" />
+        <!--   <el-table-column align="left" label="用户show_id" prop="showUid" width="120" />-->
         <el-table-column align="left" label="头像" prop="avatarUrl" width="120" >
           <template #default="scope">
             <CustomPic
@@ -76,13 +78,13 @@
           </template>
         </el-table-column>
         <el-table-column align="left" label="会员卡号" prop="cardNumber" width="120" />
-        <el-table-column align="left" label="城市" prop="city" width="120" />
+         <!--  <el-table-column align="left" label="城市" prop="city" width="120" />-->
          <el-table-column align="left" label="登录时间" prop="dateLogin" width="180">
             <template #default="scope">{{ formatDate(scope.row.dateLogin) }}</template>
          </el-table-column>
-        <el-table-column align="left" label="性别" prop="gender" width="120" />
+  <!--       <el-table-column align="left" label="性别" prop="gender" width="120" />
         <el-table-column align="left" label="注册ip" prop="ipAdd" width="120" />
-        <el-table-column align="left" label="登录ip" prop="ipLogin" width="120" />
+        <el-table-column align="left" label="登录ip" prop="ipLogin" width="120" />-->
 <!--        <el-table-column align="left" label="人脸识别" prop="isFaceCheck" width="120">-->
 <!--            <template #default="scope">{{ formatBoolean(scope.row.isFaceCheck) }}</template>-->
 <!--        </el-table-column>-->
@@ -109,13 +111,13 @@
 <!--        </el-table-column>-->
 <!--        <el-table-column align="left" label="关注用户" prop="isUserAttendant" width="120">-->
 <!--            <template #default="scope">{{ formatBoolean(scope.row.isUserAttendant) }}</template>-->
-<!--        </el-table-column>-->
+<!--        </el-table-column>
         <el-table-column align="left" label="是否虚拟人" prop="isVirtual" width="120">
             <template #default="scope">{{ formatBoolean(scope.row.isVirtual) }}</template>
-        </el-table-column>
+        </el-table-column>-->
         <el-table-column align="left" label="名字" prop="nick" width="120" />
         <el-table-column align="left" label="所在省" prop="province" width="120" />
-        <el-table-column align="left" label="vip等级" prop="vipLevel" width="120" />
+        <el-table-column sortable align="left" label="vip等级" prop="vipLevel" width="120" />
         <el-table-column align="left" label="注册来源" prop="source" width="120" />
         <el-table-column align="left" label="状态" prop="status" width="120" />
         <el-table-column align="left" label="已删除" prop="isDeleted" width="120">
@@ -230,9 +232,9 @@
 <!--            <el-form-item label="关注用户:"  prop="isUserAttendant" >-->
 <!--              <el-switch v-model="formData.isUserAttendant" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>-->
 <!--            </el-form-item>-->
-            <el-form-item label="是否虚拟人:"  prop="isVirtual" >
+        <!--    <el-form-item label="是否虚拟人:"  prop="isVirtual" >
               <el-switch v-model="formData.isVirtual" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item label="名字:"  prop="nick" >
               <el-input v-model="formData.nick" :clearable="true"  placeholder="请输入名字" />
             </el-form-item>
