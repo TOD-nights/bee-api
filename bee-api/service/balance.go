@@ -3,6 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"sync"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/kit"
@@ -10,8 +13,6 @@ import (
 	"gitee.com/stuinfer/bee-api/model"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
-	"sync"
-	"time"
 )
 
 type BalanceSrv struct {
@@ -115,7 +116,7 @@ func (srv *BalanceSrv) OperAmountByTx(c context.Context, tx *gorm.DB, userId int
 		}
 		if userAmount.Balance.GreaterThanOrEqual(decimal.NewFromFloat(100.00)) {
 			item.VipLevel = 1
-		} else if userAmount.Balance.LessThan(decimal.NewFromFloat(9.80)) {
+		} else if userAmount.Balance.LessThan(decimal.NewFromFloat(9.79)) {
 			item.VipLevel = 0
 		}
 		if err := tx.Save(item).Error; err != nil {
