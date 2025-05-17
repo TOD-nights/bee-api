@@ -155,6 +155,7 @@ func NewRouter() *gin.Engine {
 		{ //商品
 			shopGroup.GET("/goods/category/all", (api.GoodsApi{}).CategoryAll)
 			shopGroup.POST("/goods/list", (api.GoodsApi{}).List)
+			shopGroup.GET("/goods/list/membercardprod", (api.GoodsApi{}).MembercardprodList)
 			shopGroup.POST("/goods/list/v2", (api.GoodsApi{}).List)
 			shopGroup.POST("/goods/price", (api.GoodsApi{}).Price)
 			shopGroup.GET("/goods/detail", (api.GoodsApi{}).Detail)
@@ -316,6 +317,8 @@ func NewRouter() *gin.Engine {
 		memberCardGroup.POST("/buy/balance_pay", CheckToken(), api.UserMemberCardController.BalancePay)
 		memberCardGroup.POST("/buy/wxpay", CheckToken(), api.UserMemberCardController.WxPay)
 		memberCardGroup.GET("/my-member-card", CheckToken(), api.UserMemberCardController.MyMemberCard)
+		memberCardGroup.GET("/getMemberCardHxInfo", CheckToken(), api.UserMemberCardController.GetMemberCardHxInfo)
+		memberCardGroup.POST("/lingqu", CheckToken(), api.UserMemberCardController.LineQu)
 	}
 
 	return router

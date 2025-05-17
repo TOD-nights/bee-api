@@ -22,7 +22,8 @@ const showLoading = (option = {
   timer = setTimeout(() => {
     if (activeAxios > 0) {
       if (!option.target) option.target = loadDom
-      loadingInstance = ElLoading.service(option)
+      console.log('------------')
+      // loadingInstance = ElLoading.service(option)
     }
   }, 400)
 }

@@ -7,6 +7,7 @@ import (
 	"gitee.com/stuinfer/bee-api/kit"
 	"gitee.com/stuinfer/bee-api/model"
 	"gitee.com/stuinfer/bee-api/proto"
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -300,4 +301,13 @@ func (srv *GoodsSrv) GetGoodsAddition(c context.Context, goodsId int64) ([]*mode
 		retList = append(retList, addition)
 	}
 	return retList, nil
+}
+
+func (srv *GoodsSrv) MembercardprodList(c *gin.Context) ([]model.BeeShopGoods, error) {
+
+	var list []model.BeeShopGoods
+	err := db.GetDB().Model(&model.BeeShopGoods{}).Where("user_id = ? and is_member_card_prod = 0 and hidden = 0  and is_deleted = 0", kit.GetUserId(c)).
+		Find(&list).Error
+
+	return list, err
 }

@@ -53,6 +53,15 @@ func (api GoodsApi) TimesSchedule(c *gin.Context) {
 	api.Res(c, nil, enum.ErrEmpty)
 }
 
+func (api GoodsApi) MembercardprodList(context *gin.Context) {
+	list, err := service.GetGoodsSrv().MembercardprodList(context)
+	if err != nil {
+		api.Fail(context, enum.ResCodeFail, err.Error())
+		return
+	}
+	api.Success(context, list)
+}
+
 func (api BaseApi) CategoryAll(c *gin.Context) {
 	list, err := service.GetGoodsSrv().GetCategoryAll(c)
 	if err != nil {

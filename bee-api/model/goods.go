@@ -69,6 +69,7 @@ type BeeShopGoods struct {
 	Weight               decimal.Decimal  `gorm:"column:weight;type:decimal(10,2);default:0.00;comment:重量，kg" json:"weight"`
 	Type                 int64            `gorm:"column:type;type:bigint(11);comment:类型" json:"type"`
 	Unit                 string           `gorm:"column:unit;type:varchar(100);comment:单位" json:"unit"`
+	IsMemberCardProd     bool             `json:"isMemberCardProd" form:"isMemberCardProd" gorm:"column:is_member_card_prod;comment:是否是会员卡专用产品0否  1是;"`
 }
 
 func (m *BeeShopGoods) TableName() string {

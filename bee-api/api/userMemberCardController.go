@@ -3,6 +3,7 @@ package api
 import (
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/kit"
+	"gitee.com/stuinfer/bee-api/model"
 	"gitee.com/stuinfer/bee-api/service"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -49,8 +50,36 @@ func (c *userMemberCardController) MyMemberCard(ginCtx *gin.Context) {
 		c.Success(ginCtx, list)
 	}
 }
+func (c *userMemberCardController) GetMemberCardHxInfo(ginCtx *gin.Context) {
+	var uid = kit.GetUid(ginCtx)
+	if id, err := strconv.ParseInt(ginCtx.Query("id"), 10, 64); err != nil {
+		c.Fail(ginCtx, enum.ResCodeFail, err.Error())
+	} else if res, err := service.UserMemberCardService.GetMemberCardHxInfo(id, uid); err != nil {
+		c.Fail(ginCtx, enum.ResCodeFail, err.Error())
+	} else {
+		c.Success(ginCtx, res)
+	}
+}
+
+// 认领
+func (c *userMemberCardController) LineQu(context *gin.Context) {
+
+	var useLog linequReqBody
+	if err := context.Bind(&useLog); err != nil {
+		c.Fail(context, enum.ResCodeFail, err.Error())
+	} else if err := service.MemberCardService.SaveUserMemberCardLog(useLog.BeeUserMemberCardUseLog); err != nil {
+		c.Fail(context, enum.ResCodeFail, err.Error())
+	} else {
+		c.Success(context, "领取成功")
+	}
+}
 
 type balancePayBody struct {
 	MemberCardId int32 `json:"memberCardId"`
 	ShopId       int64 `json:"shopId"`
+}
+
+type linequReqBody struct {
+	model.BeeUserMemberCardUseLog
+	Token string
 }

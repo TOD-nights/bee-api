@@ -1,7 +1,12 @@
 package api
 
 import (
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/model/bee/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/plugin/beeshop/service/bee"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type beeUserMemberCardController struct{}
@@ -13,19 +18,19 @@ type beeUserMemberCardController struct{}
 // Page //member-card/page  //会员卡列表
 func (c *beeUserMemberCardController) Page(ginCtx *gin.Context) {
 
-	//var memberCardSearchInfo request.MemberCardSearchInfo
-	//if err := ginCtx.ShouldBindQuery(&memberCardSearchInfo); err != nil {
-	//	global.GVA_LOG.Error("参数异常!", zap.Error(err))
-	//	response.FailWithMessage("参数异常", ginCtx)
-	//} else {
-	//	if result, total, err := bee.MemberCardService.Page(memberCardSearchInfo); err != nil {
-	//		global.GVA_LOG.Error("查询异常!", zap.Error(err))
-	//		response.FailWithMessage("查询异常", ginCtx)
-	//	} else {
-	//
-	//		response.OkWithDetailed(map[string]interface{}{"list": result, "total": total}, "查询成功", ginCtx)
-	//	}
-	//}
+	var memberCardSearchInfo request.MemberCardSearchInfo
+	if err := ginCtx.ShouldBindQuery(&memberCardSearchInfo); err != nil {
+		global.GVA_LOG.Error("参数异常!", zap.Error(err))
+		response.FailWithMessage("参数异常", ginCtx)
+	} else {
+		if result, total, err := bee.UserMemberCardService.Page(memberCardSearchInfo); err != nil {
+			global.GVA_LOG.Error("查询异常!", zap.Error(err))
+			response.FailWithMessage("查询异常", ginCtx)
+		} else {
+
+			response.OkWithDetailed(map[string]interface{}{"list": result, "total": total}, "查询成功", ginCtx)
+		}
+	}
 }
 func (c *beeUserMemberCardController) Save(context *gin.Context) {
 

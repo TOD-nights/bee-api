@@ -170,7 +170,28 @@ func (fee *PaySrv) dealPayNotify(c context.Context, ip string, payResult *wechat
 
 			//支付成功,如果是购买会员卡,自动发放优惠卷
 			if payLog.MemberCardId > 0 {
-				GetCouponSrv().CreateMemberCardCoupon(context.Background(), payLog.MemberCardId, payLog.Uid)
+				//GetCouponSrv().CreateMemberCardCoupon(context.Background(), payLog.MemberCardId, payLog.Uid)
+				// 添加user-memberCart
+				var memberCard model.BeeMemberCard
+				if err := tx.Model(&model.BeeMemberCard{}).Take(&memberCard, payLog.MemberCardId).Error; err != nil {
+					return err
+				} else if amount, exist := payLog.Money.Float64(); !exist {
+					return errors.New("会员卡金额不合法")
+				} else {
+					var userMemberCard = model.BeeUserMemberCard{
+						UserID:     payLog.Uid,
+						CardID:     int32(payLog.MemberCardId),
+						CreateTime: time.Now(),
+						Amount:     amount,
+						Name:       memberCard.Name,
+						ValidMonth: int32(memberCard.ValidMonth),
+						OutTradeNo: payLog.OrderNo,
+						TotalCount: int32(time.Now().AddDate(0, int(memberCard.ValidMonth), 0).Sub(time.Now()).Hours() / 24.0),
+						LeftCount:  int32(time.Now().AddDate(0, int(memberCard.ValidMonth), 0).Sub(time.Now()).Hours() / 24.0),
+					}
+
+					return tx.Save(&userMemberCard).Error
+				}
 			}
 			return nil
 		})

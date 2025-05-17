@@ -129,7 +129,7 @@ mysql:
     prefix: ""
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
-    db-name: bee
+    db-name: bee_local
     username: root
     password: PASS
     path: 47.98.186.186

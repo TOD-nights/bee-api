@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/kit"
@@ -26,7 +25,7 @@ var UserMemberCardService = &userMemberCardService{}
 // 余额支付
 func (s *userMemberCardService) BalancePay(ginCtx *gin.Context, shopId int64, memberCardId int32) error {
 	var memberCard model.BeeMemberCard
-	if err := db.GetDB().Model(&model.BeeMemberCard{ID: memberCardId}).First(&memberCard).Error; err != nil {
+	if err := db.GetDB().Model(&model.BeeMemberCard{}).First(&memberCard, memberCardId).Error; err != nil {
 		logger.GetLogger().Error(err.Error())
 		return err
 	} else if amount, err := GetBalanceSrv().GetAmount(ginCtx, kit.GetUid(ginCtx)); err != nil {
@@ -64,10 +63,22 @@ func (s *userMemberCardService) BalancePay(ginCtx *gin.Context, shopId int64, me
 			if err = tx.Create(payLog).Error; err != nil {
 				return err
 			}
-			if err := GetCouponSrv().CreateMemberCardCoupon(context.Background(), payLog.MemberCardId, payLog.Uid); err != nil {
-				return err
+
+			var targetTime = memberCard.CreateTime.AddDate(0, int(memberCard.ValidMonth), 0)
+			var days = int(targetTime.Sub(memberCard.CreateTime).Hours() / 24)
+			var userMemberCard = model.BeeUserMemberCard{
+				UserID:     kit.GetUid(ginCtx), // 前端用户id
+				CardID:     memberCardId,       // 会员卡id
+				CreateTime: time.Now(),
+				Amount:     memberCard.Amount,
+				Name:       memberCard.Name, // 卡片名称
+				ValidMonth: memberCard.ValidMonth,
+				TotalCount: int32(days),
+				LeftCount:  int32(days),
+				OutTradeNo: payLog.OrderNo,
 			}
-			return nil
+
+			return db.GetDB().Save(&userMemberCard).Error
 		})
 
 		return err
@@ -157,22 +168,6 @@ func (s *userMemberCardService) WxPay(ginCtx *gin.Context, shopId int64, memberC
 				return err
 			}
 
-			// 添加user-memberCart
-			var userMemberCard = model.BeeUserMemberCard{
-				UserID:     kit.GetUid(ginCtx),
-				CardID:     memberCard.ID,
-				CreateTime: time.Now(),
-				Amount:     memberCard.Amount,
-				Name:       memberCard.Name,
-				ValidMonth: int32(memberCard.ValidMonth),
-				OutTradeNo: payOrderId,
-				TotalCount: int32(time.Now().AddDate(0, int(memberCard.ValidMonth), 0).Sub(time.Now()).Hours() / 24.0),
-				LeftCount:  int32(time.Now().AddDate(0, int(memberCard.ValidMonth), 0).Sub(time.Now()).Hours() / 24.0),
-			}
-
-			if err := tx.Save(&userMemberCard).Error; err != nil {
-				return err
-			}
 			return nil
 		}); err != nil {
 			return nil, errors.Wrap(err, "微信下单失败")
@@ -192,5 +187,20 @@ func (s *userMemberCardService) WxPay(ginCtx *gin.Context, shopId int64, memberC
 			PrepayId:   payOrderId,
 			NonceStr:   jsapiSignInfo.NonceStr,
 		}, nil
+	}
+}
+
+// 查询指定会员卡详情
+func (s *userMemberCardService) GetMemberCardHxInfo(id int64, uid int64) (proto.UserMemberCardRes, error) {
+
+	var res proto.UserMemberCardRes
+	if err := db.GetDB().Model(&model.BeeUserMemberCard{}).First(&res.BeeUserMemberCard, id).Error; err != nil {
+		return res, err
+	} else if err := db.GetDB().Model(&model.BeeMemberCard{}).First(&res.MemberCard, res.CardID).Error; err != nil {
+		return res, err
+	} else {
+		db.GetDB().Model(&model.BeeUserMemberCardUseLog{}).Where("user_card_id = ? and date_format(use_time,'%Y-%m-%d') = ?", id, time.Now().Format(time.DateOnly)).
+			First(&res.UseLog)
+		return res, nil
 	}
 }

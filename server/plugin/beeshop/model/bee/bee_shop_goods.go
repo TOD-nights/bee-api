@@ -57,7 +57,8 @@ type BeeShopGoods struct {
 	SellEndTime          *time.Time `json:"sellEndTime" form:"sellEndTime" gorm:"column:sell_end_time;comment:结束售卖时间;"`                                      //结束售卖时间
 	Weight               *float64   `json:"weight" form:"weight" gorm:"column:weight;comment:重量，kg;size:10;"`                                                //重量，kg
 	Type                 *int       `json:"type" form:"type" gorm:"column:type;comment:类型;size:19;"`                                                         //类型
-	Unit                 string     `json:"unit" form:"unit" gorm:"column:unit;comment:单位;size:100;"`                                                        //单位
+	Unit                 string     `json:"unit" form:"unit" gorm:"column:unit;comment:单位;size:100;"`
+	IsMemberCardProd     bool       `json:"isMemberCardProd" form:"isMemberCardProd" gorm:"column:is_member_card_prod;comment:是否是会员卡专用产品0否  1是;"`
 }
 
 // TableName 商品表 BeeShopGoods自定义表名 bee_shop_goods
