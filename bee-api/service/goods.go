@@ -306,7 +306,7 @@ func (srv *GoodsSrv) GetGoodsAddition(c context.Context, goodsId int64) ([]*mode
 func (srv *GoodsSrv) MembercardprodList(c *gin.Context) ([]model.BeeShopGoods, error) {
 
 	var list []model.BeeShopGoods
-	err := db.GetDB().Model(&model.BeeShopGoods{}).Where("user_id = ? and is_member_card_prod = 0 and hidden = 0  and is_deleted = 0", kit.GetUserId(c)).
+	err := db.GetDB().Debug().Model(&model.BeeShopGoods{}).Where("user_id = ? and is_member_card_prod = 1 and hidden = 0  and is_deleted = 0", kit.GetUserId(c)).
 		Find(&list).Error
 
 	return list, err

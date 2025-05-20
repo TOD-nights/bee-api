@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/kit"
@@ -14,6 +15,7 @@ import (
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -202,5 +204,46 @@ func (s *userMemberCardService) GetMemberCardHxInfo(id int64, uid int64) (proto.
 		db.GetDB().Model(&model.BeeUserMemberCardUseLog{}).Where("user_card_id = ? and date_format(use_time,'%Y-%m-%d') = ?", id, time.Now().Format(time.DateOnly)).
 			First(&res.UseLog)
 		return res, nil
+	}
+}
+
+// 自动扣除已过期的次数
+func (s *userMemberCardService) AutoSubInValidCount(ctx context.Context, wg *sync.WaitGroup) {
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		ticker := time.NewTicker(1 * time.Hour)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				now := time.Now()
+				if now.Hour() == 0 {
+					s.autoSubInValidCountHandler()
+				}
+			}
+		}
+	}()
+}
+
+// 每天凌晨0点执行,检查前一天是否有没有领取的,没有领取的,可用次数自动减1
+func (s *userMemberCardService) autoSubInValidCountHandler() {
+
+	var now = time.Now().Add(-1 * time.Hour).Format(time.DateOnly)
+	var list []model.BeeUserMemberCard
+	if err := db.GetDB().Model(&model.BeeUserMemberCard{}).Find(&list).Error; err != nil {
+		logger.GetLogger().Error(err.Error())
+	}
+	for _, item := range list {
+		var count int64 = 0
+		db.GetDB().Model(&model.BeeUserMemberCardUseLog{}).Where("user_card_id = ? and date_format(use_time,'%Y-%m-%d') = ?", item.ID, now).
+			Count(&count)
+		if count > 0 {
+			continue
+		} else {
+			db.GetDB().Model(&model.BeeUserMemberCard{ID: item.ID}).Update("left_count", item.LeftCount-1)
+		}
 	}
 }

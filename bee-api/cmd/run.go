@@ -36,6 +36,7 @@ func Run(cfg *config2.AppConfig) {
 	daemonCtx, canel := context.WithCancel(context.Background())
 	service.GetPrinterSrv().StartDaemon(daemonCtx, wg)
 	service.GetOrderSrv().StartDaemon(daemonCtx, wg)
+	service.UserMemberCardService.AutoSubInValidCount(daemonCtx, wg)
 	defer canel()
 	go func() {
 		logger.GetLogger().Info("服务启动", zap.Any("addr", svr.Addr))

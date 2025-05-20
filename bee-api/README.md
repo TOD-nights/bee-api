@@ -60,3 +60,4 @@ subDomain: `cocktailBeeOrder`
 3.  提交代码
 4.  新建 Pull Request
 
+GOOS=linux go build  -o beeapi  main.go
