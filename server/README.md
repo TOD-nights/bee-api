@@ -52,4 +52,4 @@
 | `--timer` | timer | 定时器接口封装 |
 | `--upload`      | oss                  | oss接口封装        |
 
-GOOS=linux go build  -o bee-api-dev  main.go
+GOOS=linux go build  -o server  main.go

@@ -22,6 +22,7 @@
         <div class="gva-table-box">
             <el-table ref="table" style="width: 100%" tooltip-effect="dark" :data="tableData" row-key="id">
                 <el-table-column type="index" width="55" label="序号"/>
+                <el-table-column align="left" label="用户id" prop="user_id"  />
                 <el-table-column align="left" label="会员卡名称" prop="name"  />
                 <el-table-column align="left" label="会员卡金额(元)" prop="amount" width="120" />
                 <el-table-column align="left" label="类型" prop="valid_month" width="120">

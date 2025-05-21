@@ -21,7 +21,7 @@ func (s *memberCardService) ListAll() ([]proto.MemberCardDto, error) {
 // 领取
 func (s *memberCardService) SaveUserMemberCardLog(log model.BeeUserMemberCardUseLog) error {
 	var userMemberCard model.BeeUserMemberCard
-	if err := db.GetDB().Model(&model.BeeUserMemberCard{}).First(userMemberCard, log.UserCardID).Error; err != nil {
+	if err := db.GetDB().Model(&model.BeeUserMemberCard{}).First(&userMemberCard, log.UserCardID).Error; err != nil {
 		return err
 	} else if err := db.GetDB().Model(&model.BeeUserMemberCard{ID: log.UserCardID}).Update("left_count", userMemberCard.LeftCount-1).Error; err != nil {
 		return err

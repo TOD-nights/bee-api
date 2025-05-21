@@ -26,7 +26,7 @@ func (s *userMemberCardLogService) Page(info request.MemberCardSearchInfo) ([]dt
 	tx.Count(&count)
 
 	if info.Page > 0 {
-		tx = tx.Offset((info.Page - 1) * info.PageSize).Limit(info.PageSize).Select("bee_user_member_card_use_log.*,a.name,a.valid_month ").Find(&list)
+		tx = tx.Offset((info.Page - 1) * info.PageSize).Limit(info.PageSize).Select("bee_user_member_card_use_log.*,a.user_id as user_id,a.name,a.valid_month ").Find(&list)
 	}
 
 	return list, count, tx.Error

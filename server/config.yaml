@@ -32,7 +32,7 @@ aws-s3:
     disable-ssl: false
 bee-shop:
     disable: false
-    listen: ""
+    listen: "0.0.0.0:18083"
     host: "http://9kuai8coffee.asia:8087/"
 captcha:
     key-long: 4
@@ -129,7 +129,7 @@ mysql:
     prefix: ""
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
-    db-name: bee_local
+    db-name: bee_ruian
     username: root
     password: PASS
     path: 47.98.186.186

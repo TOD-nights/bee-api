@@ -23,6 +23,7 @@
         <div class="gva-table-box">
             <el-table ref="table" style="width: 100%" tooltip-effect="dark" :data="tableData" row-key="id">
                 <el-table-column type="index" width="55" label="序号" />
+                <el-table-column align="left" label="会员id" prop="user_id" />
                 <el-table-column align="left" label="会员卡名称" prop="name" />
                 <el-table-column align="left" label="会员卡类型" prop="valid_month" width="120">
                     <template #default="scope">
@@ -84,7 +85,7 @@ const filterMemberCardType = (validMonth) => {
     }
 }
 const formatTime = (v)=>{
-    return dayjs(v.create_time).format('YYYY-MM-DD HH:mm:ss')
+    return dayjs(v.use_time).format('YYYY-MM-DD HH:mm:ss')
 }
 // 重置
 const onReset = () => {
