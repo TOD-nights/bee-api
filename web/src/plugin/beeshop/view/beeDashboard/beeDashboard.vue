@@ -55,6 +55,7 @@
     stripe
     style="width: 100%;height: 300px"
     :span-method="spanMethodHandler"
+    :default-sort="{ prop: 'dateAdd', order: 'descending' }"
   >
     <!-- 在手机上隐藏订单号列 -->
     <el-table-column 
@@ -71,9 +72,10 @@
       show-overflow-tooltip
     />
     <el-table-column 
-      prop="datePay" 
+      prop="dateAdd" 
       label="支付时间"
       min-width="120"
+      sortable
     >
       <template #default="scope">
         {{ dateFmt(scope.row.dateAdd) }}
