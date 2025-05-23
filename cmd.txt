@@ -1,3 +1,10 @@
+GOOS=linux go build -o server main.go
+ps -ef |grep beeapi 就能看到运行的程序,kill就行,
+nohup ./beeapi & 就是启动命令
+生成后,直接拖到服务器指定目录就行
+/root/jiamengshang 放到这个里面的对应文件夹里面
+分别是小程序接口和后台管理系统的接口
+
 后端服务
 编译
 cd /root/bee-api/server && go build -o server main.go
