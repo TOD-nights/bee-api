@@ -74,8 +74,73 @@
           <el-input v-model.number="searchInfo.uid" placeholder="搜索条件" />
         </el-form-item>
         <el-form-item label="门店" prop="shopid">
-          <el-input v-model.number="searchInfo.shopid" placeholder="搜索条件" />
+          <el-select
+            v-model="searchInfo.shopid"
+            clearable
+            placeholder="请选择门店"
+            @clear="
+              () => {
+                searchInfo.shopid = undefined;
+              }
+            "
+          >
+            <el-option
+              v-for="(item, index) in shops"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
+
+        <el-form-item label="支付状态" prop="status">
+          <el-select
+            v-model="searchInfo.status"
+            clearable
+            placeholder="请选择"
+            @clear="
+              () => {
+                searchInfo.status = undefined;
+              }
+            "
+          >
+            <el-option
+              v-for="(item, key) in beePayLogStatus"
+              :key="key"
+              :label="item.label"
+              :value="parseInt(item.value)"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="用户id" prop="uid">
+          <el-input v-model.number="searchInfo.uid" placeholder="搜索条件" />
+        </el-form-item>
+        <el-form-item label="门店" prop="shopid">
+          <el-select
+            v-model="searchInfo.shopid"
+            filterable
+            clearable
+            placeholder="请输入门店名称"
+            @clear="
+              () => {
+                searchInfo.shopid = undefined;
+              }
+            "
+          >
+            <el-option
+              v-for="(item, index) in shops"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+
+
+
+
+
+
 
         <template v-if="showAllQuery">
           <!-- 将需要控制显示状态的查询条件添加到此范围内 -->
