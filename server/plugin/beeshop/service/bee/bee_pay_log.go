@@ -65,7 +65,8 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(c *gin.Context, i
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&dto.BeePayLogInfoDto{}).Joins(" left join bee_order a on a.order_number = bee_pay_log.order_number left join bee_shop_info b on( b.id = a.shop_id or bee_pay_log.shop_id = b.id)")
+	db := global.GVA_DB.Model(&dto.BeePayLogInfoDto{}).Joins(" left join bee_order a on a.order_number = bee_pay_log.order_number left join bee_shop_info b on( b.id = a.shop_id or bee_pay_log.shop_id = b.id)" +
+		" left join (select group_concat(goods_name) as goodsName ,order_id from bee_order_goods group by order_id) c on c.order_id = a.id")
 	db = db.Where("bee_pay_log.user_id = ?", shopUserId)
 	var beePayLogs []dto.BeePayLogInfoDto
 	// 如果有条件搜索 下方会自动创建搜索语句
@@ -89,6 +90,9 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(c *gin.Context, i
 	}
 	if info.Uid != nil {
 		db = db.Where("bee_pay_log.uid = ?", info.Uid)
+	}
+	if len(info.GoodsName) > 0 {
+		db = db.Where("c.goodsName like ?", "%"+info.GoodsName+"%")
 	}
 
 	if _, exist := c.Get("admin"); !exist {
@@ -118,7 +122,7 @@ func (beePayLogService *BeePayLogService) GetBeePayLogInfoList(c *gin.Context, i
 	}
 
 	if limit != 0 {
-		db = db.Limit(limit).Offset(offset).Select("bee_pay_log.*, b.name as shopName").Debug()
+		db = db.Limit(limit).Offset(offset).Select("bee_pay_log.*, b.name as shopName, c.goodsName, a.goods_number").Debug()
 	}
 
 	err = db.Scan(&beePayLogs).Error

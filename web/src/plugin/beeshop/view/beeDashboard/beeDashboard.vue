@@ -66,7 +66,7 @@
       class="hidden sm:table-cell"
     />
     <el-table-column
-      prop="amount"
+      prop="amountReal"
       label="订单金额"
       align="center"
       show-overflow-tooltip
@@ -348,10 +348,9 @@ const refreshOrders = async () => {
     endDateAdd:dates.value[1]
   });
   if (ordersRes.code == 0) {
-    console.log(ordersRes.data.list, "ordersRes.data.list");
     orders.value = [
       ...ordersRes.data.list,
-      { amount: ordersRes.data.sum, orderNumber: "合计" },
+      { amountReal: ordersRes.data.sum, orderNumber: "合计" },
     ];
     totalOrders.value = ordersRes.data.total;
   }

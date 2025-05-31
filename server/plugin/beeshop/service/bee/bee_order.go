@@ -186,7 +186,7 @@ func (beeOrderService *BeeOrderService) GetBeeOrderInfoList(c *gin.Context, info
 		return
 	}
 	var sums []float64
-	if err = db.Session(&gorm.Session{}).Where("status = 1").Select("ifnull(sum(amount),0) amount").Pluck("amount", &sums).Error; err != nil {
+	if err = db.Session(&gorm.Session{}).Where("status = 1").Select("ifnull(sum(amount_real),0) amount_real").Pluck("amount_real", &sums).Error; err != nil {
 		global.GVA_LOG.Error("订单列表查询,统计订单总金额失败")
 		return
 	}

@@ -92,7 +92,9 @@
             />
           </el-select>
         </el-form-item>
-
+        <el-form-item label="商品名" prop="goodsName">
+          <el-input v-model="searchInfo.goodsName" placeholder="搜索条件" />
+        </el-form-item>
         <el-form-item label="支付状态" prop="status">
           <el-select
             v-model="searchInfo.status"
@@ -115,7 +117,7 @@
         <el-form-item label="用户id" prop="uid">
           <el-input v-model.number="searchInfo.uid" placeholder="搜索条件" />
         </el-form-item>
-        <el-form-item label="门店" prop="shopid">
+        <!-- <el-form-item label="门店" prop="shopid">
           <el-select
             v-model="searchInfo.shopid"
             filterable
@@ -134,7 +136,7 @@
               :value="item.id"
             />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
 
 
 
@@ -230,6 +232,18 @@
           align="left"
           label="门店"
           prop="shopName"
+          width="120"
+        />
+        <el-table-column
+          align="left"
+          label="商品"
+          prop="goodsName"
+          width="120"
+        />
+        <el-table-column
+          align="left"
+          label="商品数量"
+          prop="goods_number"
           width="120"
         />
         <el-table-column
@@ -482,8 +496,10 @@ import {
   onDownloadFile,
   formatEnum,
 } from "@/utils/format";
+import { getAllMyBeeShopInfos } from "@/plugin/beeshop/api/beeShopInfo";
+
 import { ElMessage, ElMessageBox } from "element-plus";
-import { ref, reactive } from "vue";
+import { ref, reactive,onMounted } from "vue";
 
 defineOptions({
   name: "BeePayLog",
@@ -599,7 +615,7 @@ const searchRule = reactive({
 
 const elFormRef = ref();
 const elSearchFormRef = ref();
-
+const shops = ref([])
 // =========== 表格控制部分 ===========
 const page = ref(1);
 const total = ref(0);
@@ -608,6 +624,14 @@ const tableData = ref([]);
 const searchInfo = ref({
   sort: "id",
   order: "descending",
+});
+
+onMounted(()=>{
+  getAllMyBeeShopInfos().then((res) => {
+    if (res.code == 0) {
+      shops.value = res.data.list;
+    }
+  });
 });
 // 排序
 const sortChange = ({ prop, order }) => {

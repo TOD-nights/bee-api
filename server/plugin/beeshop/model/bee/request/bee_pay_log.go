@@ -16,8 +16,9 @@ type BeePayLogSearch struct {
 	Status          string     `json:"status" form:"status" `
 	Uid             *int       `json:"uid" form:"uid" `
 	request.PageInfo
-	Sort     string `json:"sort" form:"sort"`
-	Order    string `json:"order" form:"order"`
-	Distinct string `json:"distinct" form:"distinct"`
-	Sum      string `json:"sum" form:"sum"`
+	Sort      string `json:"sort" form:"sort"`
+	Order     string `json:"order" form:"order"`
+	Distinct  string `json:"distinct" form:"distinct"`
+	Sum       string `json:"sum" form:"sum"`
+	GoodsName string `json:"goodsName" form:"goodsName"`
 }
