@@ -13,6 +13,7 @@ import (
 	"github.com/go-pay/gopay"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"strconv"
 	"sync"
@@ -243,6 +244,7 @@ func (s *userMemberCardService) autoSubInValidCountHandler() {
 		if count > 0 {
 			continue
 		} else {
+			logger.GetLogger().Warn("更新left_count", zap.Any("left_count", count), zap.Int32("id", item.ID))
 			db.GetDB().Model(&model.BeeUserMemberCard{ID: item.ID}).Update("left_count", item.LeftCount-1)
 		}
 	}
