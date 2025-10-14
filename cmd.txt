@@ -96,10 +96,12 @@ nginx -s reload
 cd /root/bee-api && git pull
 
 服务器上传GitHub
-git add .
-git commit -m "Add new files"
-git push origin main
+cd /root/bee-api && git add .
+git commit -m "Add new files" && git push origin main
+如果你确认远程仓库的更改不重要，也可以用 强推（强制覆盖）：
+git push -f origin main
 
+grep -r "更新left_count" /root/bee-api
 
 2. 拉取最新的远程分支
 在切换之前，先确保远程分支 shopid 存在：
