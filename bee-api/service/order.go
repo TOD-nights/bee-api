@@ -599,6 +599,7 @@ func (s *OrderSrv) CreateOrder(c context.Context, ip string, req *proto.CreateOr
 	resp.HxNumber = order.HxNumber
 	resp.IsPay = order.IsPay
 	resp.OrderNumber = order.OrderNumber
+	resp.Qudanhao = order.Qudanhao
 	resp.NearbyCloseMillis = dateClose.UnixMilli()
 	resp.Status = order.Status
 	s.afterCreateOrder(c, shopInfo, order)

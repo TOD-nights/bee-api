@@ -1,12 +1,13 @@
 package proto
 
 import (
+	"math"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/model"
 	"github.com/shopspring/decimal"
 	"github.com/spf13/cast"
-	"math"
-	"time"
 )
 
 type BeeOrderGoods struct {
@@ -172,6 +173,7 @@ type CreateOrderResp struct {
 	HxNumber               string            `json:"hxNumber"`
 	IsPay                  bool              `json:"isPay"`
 	OrderNumber            string            `json:"orderNumber"`
+	Qudanhao               string            `json:"qudanhao"`
 	NearbyCloseMillis      int64             `json:"nearbyCloseMillis"` // 订单关闭时间
 	Status                 enum.OrderStatus  `json:"status"`
 }
