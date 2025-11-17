@@ -11,6 +11,11 @@ cd /root/bee-api/server && go build -o server main.go
 cd /root/bee-api/bee-api && go build -o beeapi main.go
 启动
 systemctl start bee-server
+不行的话手动运行程序，看看输出错误信息：
+cd /root/bee-api/server
+./server
+
+
 systemctl start bee-api
 停止
 systemctl stop bee-server
