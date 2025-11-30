@@ -2,6 +2,10 @@ package service
 
 import (
 	"context"
+	"strconv"
+	"sync"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/kit"
@@ -15,9 +19,6 @@ import (
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"strconv"
-	"sync"
-	"time"
 )
 
 type userMemberCardService struct {
@@ -197,15 +198,22 @@ func (s *userMemberCardService) WxPay(ginCtx *gin.Context, shopId int64, memberC
 func (s *userMemberCardService) GetMemberCardHxInfo(id int64, uid int64) (proto.UserMemberCardRes, error) {
 
 	var res proto.UserMemberCardRes
-	if err := db.GetDB().Model(&model.BeeUserMemberCard{}).First(&res.BeeUserMemberCard, id).Error; err != nil {
+
+	// 1. 用户持卡记录
+	if err := db.GetDB().Model(&model.BeeUserMemberCard{}).
+		First(&res.BeeUserMemberCard, id).Error; err != nil {
 		return res, err
-	} else if err := db.GetDB().Model(&model.BeeMemberCard{}).First(&res.MemberCard, res.CardID).Error; err != nil {
-		return res, err
-	} else {
-		db.GetDB().Model(&model.BeeUserMemberCardUseLog{}).Where("user_card_id = ? and date_format(use_time,'%Y-%m-%d') = ?", id, time.Now().Format(time.DateOnly)).
-			First(&res.UseLog)
-		return res, nil
 	}
+
+	// 2. 会员卡基础信息
+	if err := db.GetDB().Model(&model.BeeMemberCard{}).
+		First(&res.MemberCard, res.CardID).Error; err != nil {
+		return res, err
+	}
+
+	// 3. 不再限制每日一次，不查 UseLog
+	return res, nil
+
 }
 
 // 自动扣除已过期的次数
