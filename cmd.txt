@@ -1,3 +1,8 @@
+配置文件
+server/config.relaease.yaml
+
+
+
 GOOS=linux go build -o server main.go
 ps -ef |grep beeapi 就能看到运行的程序,kill就行,
 nohup ./beeapi & 就是启动命令
@@ -9,19 +14,26 @@ nohup ./beeapi & 就是启动命令
 编译
 cd /root/bee-api/server && go build -o server main.go
 cd /root/bee-api/bee-api && go build -o beeapi main.go
+
+成功后运行：
+
+./beeapi
+
+
 启动
 systemctl start bee-server
 不行的话手动运行程序，看看输出错误信息：
 cd /root/bee-api/server
 ./server
 
+Woshinibaba88!
 
 systemctl start bee-api
 停止
 systemctl stop bee-server
 systemctl stop bee-api
 重启
-systemctl restart bee-server
+systemctl restart bee-server  
 systemctl restart bee-api
 查看状态
 systemctl status bee-server
@@ -41,9 +53,15 @@ go run main.go
 kill -9 `ps -ef | grep beeapi | grep -v grep | awk '{print $2}'` && nohup ./beeapi > beeapi.log 2>&1 &
 
 去看日志： 
+cd /root/bee-api/bee-api
+ls
+
 tail +F beeapi.log
 tail -f /root/bee-api/bee-api/nohup.out
 tail -f /root/bee-api/server/nohup.out
+
+cd /root/bee-api/server/log
+
 
 
 # 检查端口是否正常监听
@@ -87,6 +105,9 @@ npm run build# 生产环境
 
 powershell把打包出来的dist文件夹去替换/var/www/bee文件 
 scp -r "D:\progetti\coffee\bee-api-gitee\web\dist\*" root@47.98.186.186:/var/www/bee/
+scp -r "D:\\progetti\\coffee\\bee-api-gitee\\bee-api\\beeapi" root@47.98.186.186:/root/bee-api/
+scp -r "D:\\progetti\\coffee\\bee-api-gitee\\server\\server" root@47.98.186.186:/root/bee-api/server/
+
 Woshinibaba88!
 # 检查文件是否上传成功
 ls -la /var/www/bee/
@@ -95,6 +116,28 @@ ls -la /var/www/bee/
 systemctl restart nginx
 
 nginx -s reload
+
+
+-------
+0.本地打包
+vscode terminal PowerShell里
+$env:GOOS = "linux"
+$env:GOARCH = "amd64"
+go build -o server main.go
+
+
+1. 查看 /root/bee-api/server 里的 server 文件日期
+ls -l /root/bee-api/server
+
+ 2. 把 server 改名为 serverold
+mv /root/bee-api/server/server /root/bee-api/server/serverold
+
+3 本地上传服务器
+scp -r "D:\\progetti\\coffee\\bee-api-gitee\\server\\server" root@47.98.186.186:/root/bee-api/server/
+
+4加执行权限
+chmod +x /root/bee-api/server/server
+
 
 --------
 
@@ -138,4 +181,11 @@ systemctl start MySQL
 
 
 https://api.it120.cc
+
+
+----
+
+怎么查看systemctl start bee-server 有哪些命令
+
+root@iZbp16ips7cegetu16ygflZ:~/bee-api/server# sudo systemctl cat bee-server # /etc/systemd/system/bee-server.service [Unit] Description=Bee Server Application After=network.target StartLimitIntervalSec=60 StartLimitBurst=3 [Service] Type=simple User=root WorkingDirectory=/root/bee-api/server ExecStart=/root/bee-api/server/server Restart=always RestartSec=5 StandardOutput=syslog StandardError=syslog SyslogIdentifier=bee-server Environment=GIN_MODE=release [Install] WantedBy=multi-user.target
 
