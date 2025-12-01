@@ -28,6 +28,7 @@ cd /root/bee-api/server
 
 Woshinibaba88!
 
+
 systemctl start bee-api
 停止
 systemctl stop bee-server
@@ -118,9 +119,13 @@ systemctl restart nginx
 nginx -s reload
 
 
--------
+-----------------------------------
 0.本地打包
+
 vscode terminal PowerShell里
+
+设置 Go 国内代理
+go env -w GOPROXY=https://goproxy.cn,direct
 $env:GOOS = "linux"
 $env:GOARCH = "amd64"
 go build -o server main.go
