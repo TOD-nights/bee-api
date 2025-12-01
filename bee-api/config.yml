@@ -1,7 +1,7 @@
 app:
  listen: :8081
  storePath: "uploads/file" # 本地上传文件的路径
- host: "https://frp.fangvv.cn/"
+ host: "https://9kuai8coffee.asia"
 #
 default:
  wx:
@@ -27,6 +27,6 @@ db:
  password: PASS
  host: 47.98.186.186
  port: 3306
- database: bee_local
+ database: bee
  drop: false #是否清之前的数据
  needInit: false #是否需要初始化数据
