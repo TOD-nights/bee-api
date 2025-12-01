@@ -61,7 +61,7 @@ db-list:
       config: charset=utf8mb4&parseTime=True&loc=Local
       db-name: bee
       username: root
-      password: PASS
+      password: Woshinibaba88!
       path: 127.0.0.1
       engine: ""
       log-mode: error
@@ -131,7 +131,7 @@ mysql:
     config: charset=utf8mb4&parseTime=True&loc=Local
     db-name: bee
     username: root
-    password: "PASS"
+    password: "Woshinibaba88!"
     path: 127.0.0.1
     engine: ""
     log-mode: error
