@@ -6,7 +6,7 @@ type OrderStatus int32
 type AutoDeliverStatus int32
 type OrderReputation int32 // 评价状态，0 差评 1 中评 2 好评
 
-// OrderType 0 普通订单 1 周期订单 2 扫码点餐订单 3 京东vop订单 4 从区管进货
+// OrderType 0 普通订单 1 周期订单 2 扫码点餐订单 3 京东vop订单 4 从区管进货, 5拼单订单
 type OrderType int32
 type OrderRefundStatus int32
 type OrderGoodsStatus int32
@@ -30,6 +30,7 @@ var OrderTypeMap = map[OrderType]string{
 	OrderTypeScan:      "扫码点餐订单",
 	OrderTypeJdVop:     "京东vop订单",
 	OrderTypeReceiving: "从区管进货",
+	OrderTypePindan:    "拼单订单",
 }
 
 var OrderStatusMap = map[OrderStatus]string{
@@ -92,6 +93,7 @@ const (
 	OrderTypeScan      = 2
 	OrderTypeJdVop     = 3
 	OrderTypeReceiving = 4
+	OrderTypePindan    = 5
 
 	OrderReputationNone   = -1
 	OrderReputationBad    = 0

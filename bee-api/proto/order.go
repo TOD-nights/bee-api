@@ -321,3 +321,8 @@ type GetOrderDetailResp struct {
 	Logistics *model.BeeOrderLogistics `json:"logistics"`
 	Logs      []*model.BeeOrderLog     `json:"logs"`
 }
+
+// / 发起拼单请求
+type CreatePindanReq struct {
+	PrimaryOrderId int64 `json:"primaryOrderId"` // 主订单ID
+}

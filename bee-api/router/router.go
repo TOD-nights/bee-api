@@ -2,6 +2,10 @@ package router
 
 import (
 	_ "embed"
+	"net/http"
+	"os"
+	"strings"
+
 	"gitee.com/stuinfer/bee-api/api"
 	config2 "gitee.com/stuinfer/bee-api/config"
 	"gitee.com/stuinfer/bee-api/enum"
@@ -11,9 +15,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"net/http"
-	"os"
-	"strings"
 )
 
 var router = gin.New()
@@ -264,6 +265,7 @@ func NewRouter() *gin.Engine {
 		orderGroup.POST("/delivery", (api.OrderApi{}).Delivery)
 		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation) //评价
 		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                 //核销
+		orderGroup.POST("/createPindan", (api.PindanApi{}).Create)  //确认收货
 	}
 	scoreGroup := domainGroup.Group("/score", CheckToken())
 	{
