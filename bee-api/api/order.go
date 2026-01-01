@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/logger"
 	"gitee.com/stuinfer/bee-api/proto"
@@ -32,6 +33,7 @@ func (api OrderApi) Create(c *gin.Context) {
 		return
 	}
 	resp, err := service.GetOrderSrv().CreateOrder(c, c.ClientIP(), &req)
+
 	api.Res(c, resp, err)
 }
 

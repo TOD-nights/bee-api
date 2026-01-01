@@ -5,6 +5,7 @@ package enum
 type OrderStatus int32
 type AutoDeliverStatus int32
 type OrderReputation int32 // 评价状态，0 差评 1 中评 2 好评
+type PeisongType int8      // 配送类型 1.自提 2.配送
 
 // OrderType 0 普通订单 1 周期订单 2 扫码点餐订单 3 京东vop订单 4 从区管进货, 5拼单订单
 type OrderType int32
@@ -72,6 +73,11 @@ var OrderPeisongStatusMap = map[OrderPaisongStatus]string{
 	OrderPaisongStatusArrive:     "达达已送达",
 }
 
+var OrderPeisongTypeMap = map[PeisongType]string{
+	OrderPeisongTypeZiti:    "自提",
+	OrderPeisongTypePeisong: "配送",
+}
+
 const (
 	OrderStatusClose          OrderStatus = -1
 	OrderStatusUnPaid         OrderStatus = 0
@@ -133,4 +139,7 @@ const (
 	AutoDeliverStatusNone AutoDeliverStatus = 0
 	AutoDeliverStatusOn   AutoDeliverStatus = 1
 	AutoDeliverStatusOff  AutoDeliverStatus = 2
+
+	OrderPeisongTypeZiti    PeisongType = 1 // 自提
+	OrderPeisongTypePeisong PeisongType = 2 // 配送
 )

@@ -2,10 +2,15 @@ package db
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"sync"
+	"time"
+
 	config2 "gitee.com/stuinfer/bee-api/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"sync"
+	"gorm.io/gorm/logger"
 )
 
 var instance *DB
@@ -16,7 +21,18 @@ type DB struct {
 }
 
 func NewDB(dsn string) (*DB, error) {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		PrepareStmt:            true,
+		SkipDefaultTransaction: true,
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold: time.Second, // 慢 SQL 阈值
+				LogLevel:      logger.Info, // 日志级别：Silent、Error、Warn、Info
+				Colorful:      true,        // 彩色打印
+			},
+		),
+	})
 	if err != nil {
 		return nil, err
 	}

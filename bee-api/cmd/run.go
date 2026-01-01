@@ -2,6 +2,14 @@ package cmd
 
 import (
 	"context"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
+
 	config2 "gitee.com/stuinfer/bee-api/config"
 	"gitee.com/stuinfer/bee-api/logger"
 	"gitee.com/stuinfer/bee-api/model"
@@ -10,13 +18,6 @@ import (
 	"gitee.com/stuinfer/bee-api/sys"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
 )
 
 func Run(cfg *config2.AppConfig) {
@@ -34,8 +35,8 @@ func Run(cfg *config2.AppConfig) {
 	defer wg.Wait()
 
 	daemonCtx, canel := context.WithCancel(context.Background())
-	service.GetPrinterSrv().StartDaemon(daemonCtx, wg)
-	service.GetOrderSrv().StartDaemon(daemonCtx, wg)
+	// service.GetPrinterSrv().StartDaemon(daemonCtx, wg)
+	// service.GetOrderSrv().StartDaemon(daemonCtx, wg)
 	service.UserMemberCardService.AutoSubInValidCount(daemonCtx, wg)
 	defer canel()
 	go func() {

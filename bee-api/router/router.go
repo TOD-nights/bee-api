@@ -75,6 +75,9 @@ func CheckToken() gin.HandlerFunc {
 		if token == "" {
 			token = c.PostForm("token")
 		}
+		if token == "" {
+			token = c.GetHeader("x-token")
+		}
 
 		if token == "" {
 			c.Abort()
@@ -263,9 +266,11 @@ func NewRouter() *gin.Engine {
 		orderGroup.POST("/close", (api.OrderApi{}).Close)
 		orderGroup.POST("/delete", (api.OrderApi{}).Delete)
 		orderGroup.POST("/delivery", (api.OrderApi{}).Delivery)
-		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation) //评价
-		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                 //核销
-		orderGroup.POST("/createPindan", (api.PindanApi{}).Create)  //确认收货
+		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation)               //评价
+		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                               //核销
+		orderGroup.POST("/createPindan", (api.PindanApi{}).Create)                //发起拼单
+		orderGroup.GET("/getPinDanInfo", (api.PindanApi{}).GetPinDanInfo)         //查询拼单信息
+		orderGroup.GET("/getPinDanInfoById", (api.PindanApi{}).GetPinDanInfoById) //查询拼单信息
 	}
 	scoreGroup := domainGroup.Group("/score", CheckToken())
 	{
