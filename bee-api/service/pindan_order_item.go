@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/common"
 	"gitee.com/stuinfer/bee-api/config"
 	"gitee.com/stuinfer/bee-api/db"
@@ -14,11 +16,11 @@ import (
 	"gitee.com/stuinfer/bee-api/util"
 	"github.com/agiledragon/gomonkey/v2"
 	"github.com/spf13/cast"
-	"time"
+
+	"testing"
 
 	"github.com/shopspring/decimal"
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
 )
 
 func TestOrderSrv_CreateOrderDada(t *testing.T) {

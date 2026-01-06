@@ -154,6 +154,7 @@ func NewRouter() *gin.Engine {
 	{
 		{ // 门店
 			shopGroup.GET("/subshop/detail/v2", (api.ShopApi{}).SubShopDetail)
+			shopGroup.GET("/subshop/info", (api.ShopApi{}).GetShopInfo) // 门店详细
 			shopGroup.POST("/subshop/list", (api.ShopApi{}).SubShopList)
 		}
 		{ //商品
@@ -266,11 +267,16 @@ func NewRouter() *gin.Engine {
 		orderGroup.POST("/close", (api.OrderApi{}).Close)
 		orderGroup.POST("/delete", (api.OrderApi{}).Delete)
 		orderGroup.POST("/delivery", (api.OrderApi{}).Delivery)
-		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation)               //评价
-		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                               //核销
-		orderGroup.POST("/createPindan", (api.PindanApi{}).Create)                //发起拼单
-		orderGroup.GET("/getPinDanInfo", (api.PindanApi{}).GetPinDanInfo)         //查询拼单信息
-		orderGroup.GET("/getPinDanInfoById", (api.PindanApi{}).GetPinDanInfoById) //查询拼单信息
+		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation)                                        //评价
+		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                                                        //核销
+		orderGroup.POST("/createPindan", (api.PindanApi{}).Create)                                         //发起拼单
+		orderGroup.POST("/joinPindan", (api.PindanApi{}).Join)                                             //发起拼单
+		orderGroup.GET("/getPinDanInfo", (api.PindanApi{}).GetPinDanInfo)                                  //查询拼单信息
+		orderGroup.GET("/getPinDanInfoById", (api.PindanApi{}).GetPinDanInfoById)                          //查询拼单信息
+		orderGroup.POST("/updatePindanPeisongTypeById/:id", (api.PindanApi{}).UpdatePindanPeisongTypeById) // 更新拼单配送方式
+		orderGroup.GET("/getMyCreatedPindanRecord", (api.PindanApi{}).GetMyCreatedPindanRecord)            // 我发起的拼单查询
+		orderGroup.GET("/getMyJoinedPindanRecord", (api.PindanApi{}).GetMyJoinedPindanRecord)              // 我发起的拼单查询
+		orderGroup.POST("/pindan/buy/wxpay", (api.PindanApi{}).PindanWxPay)                                // 微信支付拼单订单
 	}
 	scoreGroup := domainGroup.Group("/score", CheckToken())
 	{

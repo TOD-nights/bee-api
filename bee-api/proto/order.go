@@ -326,6 +326,7 @@ type GetOrderDetailResp struct {
 
 // / 发起拼单请求
 type CreatePindanReq struct {
+	PindanId    int64                `json:"pindanId" form:"pindanId"`       // pindanId
 	GoodsId     int64                `json:"goodsId" form:"goodsId"`         // 商品ID
 	Number      int64                `json:"number" form:"number"`           // 商品数量
 	Addition    string               `json:"addition" form:"addition"`       // 其他附加信息
@@ -419,24 +420,24 @@ type PindanItemResp struct {
 }
 
 type PindanItemGoods struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-	Pic  string `json:"pic"`
+	Id   int64  `json:"id" mapstructure:"id"`
+	Name string `json:"name" mapstructure:"name"`
+	Pic  string `json:"pic" mapstructure:"pic"`
 }
 
 type PinDanUserInfo struct {
-	Id        int64  `json:"id"`        // 用户ID
-	Nick      string `json:"nick"`      // 昵称
-	AvatarUrl string `json:"avatarUrl"` // 头像
-	Mobile    string `json:"mobile"`    // 手机号码
+	Id        int64  `json:"id" mapstructure:"id"`               // 用户ID
+	Nick      string `json:"nick" mapstructure:"nick"`           // 昵称
+	AvatarUrl string `json:"avatarUrl" mapstructure:"avatarUrl"` // 头像
+	Mobile    string `json:"mobile" mapstructure:"mobile"`       // 手机号码
 }
 
 // / 拼单店铺信息
 type PindanShopInfo struct {
-	Id        int64   `json:"id"`        // 店铺ID
-	Address   string  `json:"address"`   // 店铺地址
-	Name      string  `json:"name"`      // 店铺名称
-	LinkPhone string  `json:"linkPhone"` // 店铺联系电话
-	Latitude  float64 `json:"latitude"`  // 店铺纬度
-	Longitude float64 `json:"longitude"` // 店铺经度
+	Id        int64   `json:"id" mapstructure:"id"`               // 店铺ID
+	Address   string  `json:"address" mapstructure:"address"`     // 店铺地址
+	Name      string  `json:"name" mapstructure:"name"`           // 店铺名称
+	LinkPhone string  `json:"linkPhone" mapstructure:"linkPhone"` // 店铺联系电话
+	Latitude  float64 `json:"latitude" mapstructure:"latitude"`   // 店铺纬度
+	Longitude float64 `json:"longitude" mapstructure:"longitude"` // 店铺经度
 }

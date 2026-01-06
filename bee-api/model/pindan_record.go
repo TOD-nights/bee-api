@@ -9,7 +9,7 @@ import (
 // 拼单记录表
 type PinDanRecord struct {
 	common.BaseModel
-	Amount          decimal.Decimal `gorm:"column:amount;type:decimal(10,2);comment:商品金额" json:"amount"` // 总价格
+	Amount          decimal.Decimal `gorm:"column:amount;type:decimal(10,2);comment:商品金额" json:"amount" mapstructure:"amount"` // 总价格
 	AmountCoupons   decimal.Decimal `gorm:"column:amount_coupons;type:decimal(10,2);comment:优惠券抵扣" json:"amountCoupons"`
 	AmountLogistics decimal.Decimal `gorm:"column:amount_logistics;type:decimal(10,2);comment:运费" json:"amountLogistics"`
 	AmountBalance   decimal.Decimal `gorm:"column:amount_balance;type:decimal(10,2);comment:余额抵扣" json:"amountBalance"`
@@ -28,7 +28,7 @@ type PinDanRecord struct {
 	ShopId      int64            `gorm:"column:shop_id;type:bigint(11);comment:商店id" json:"shopId"`
 	ShopIdZt    int64            `gorm:"column:shop_id_zt;type:bigint(11);comment:自提商店id" json:"shopIdZt"`
 	ShopNameZt  string           `gorm:"column:shop_name_zt;type:varchar(100);comment:自提商店名称" json:"shopNameZt"`
-	Status      enum.OrderStatus `gorm:"column:status;type:bigint(11);comment:订单状态，0未发货" json:"status"`
+	Status      enum.OrderStatus `gorm:"column:status;type:bigint(11);comment:订单状态，0未支付  1待核销  2已完成" json:"status"`
 	ExtJsonStr  string           `gorm:"column:ext_json_str;type:varchar(1000);comment:扩展信息" json:"extJsonStr"`
 	PeisongType int8             `gorm:"column:peisong_type;type:int(2);comment:配送类型, 1.自提 2.配送" json:"peisongType"`
 	IsVip       bool             `gorm:"column:is_vip;type:tinyint(1);comment:是否是vip订单" json:"isVip"`

@@ -4,13 +4,14 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"github.com/golang-module/carbon/v2"
 	"strings"
 	"time"
+
+	"github.com/golang-module/carbon/v2"
 )
 
 type BaseModel struct {
-	Id         int64        `gorm:"column:id;type:bigint(20) unsigned;primary_key;AUTO_INCREMENT" json:"id"`
+	Id         int64        `gorm:"column:id;type:bigint(20) unsigned;primary_key;AUTO_INCREMENT" json:"id" mapstructure:"id"`
 	UserId     int64        `gorm:"column:user_id;type:bigint(20);<-:create" json:"userId"` //主账号uid
 	IsDeleted  bool         `gorm:"column:is_deleted;type:tinyint(1)" json:"isDeleted"`
 	DateAdd    JsonTime     `gorm:"column:date_add;type:datetime(3);default:null;<-:create" json:"dateAdd"`
