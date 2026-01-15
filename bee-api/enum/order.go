@@ -85,6 +85,7 @@ const (
 	OrderStatusShipped        OrderStatus = 2 // 已发货待确认
 	OrderStatusConfirmShipped OrderStatus = 3 // 确认收货待评价
 	OrderStatusHadComment     OrderStatus = 4 // 已评价
+	OrderStatusQudan          OrderStatus = 5 //已取单
 
 	OrderGoodsStatusNone           OrderGoodsStatus = 0 // 无
 	OrderGoodsStatusShipped        OrderGoodsStatus = 2 // 已发货待确认

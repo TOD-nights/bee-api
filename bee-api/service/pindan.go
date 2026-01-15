@@ -65,7 +65,7 @@ func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*prot
 		Token:           wxPayConfig.Token,
 		ReturnUrl:       "",
 		NotifyUrl:       GetPaySrv().GetWxPayNotifyUrl(ginCtx, &wxPayConfig),
-		PrivateCertPath: wxPayConfig.PrivateCert,
+		PrivateCertPath: "/Users/mac/project/bee-api/bee-api/lingwu_key.pem", //wxPayConfig.PrivateCert,
 		Debug:           wxPayConfig.Debug,
 	}); err != nil {
 		return nil, errors.Wrap(err, "获取微信支付客户端失败！")
@@ -75,16 +75,20 @@ func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*prot
 		return nil, errors.Wrap(err, "获取用户信息失败")
 	} else {
 
-		var total = decimal.NewFromInt(0)
-		for _, v := range pindanRecordItems {
-			if user.VipLevel > 0 {
-				total = total.Add(v.AmountVip.Mul(decimal.NewFromInt(v.GoodsNumber)))
-			} else {
-				total = total.Add(v.Amount.Mul(decimal.NewFromInt(v.GoodsNumber)))
-			}
-		}
+		var totalOri = decimal.NewFromInt(0)
+		var totalVip = decimal.NewFromInt(0)
 
-		fmt.Println(user.VipLevel)
+		for _, v := range pindanRecordItems {
+			totalVip = totalVip.Add(v.AmountVip.Mul(decimal.NewFromInt(v.GoodsNumber)))
+			totalOri = totalOri.Add(v.Amount.Mul(decimal.NewFromInt(v.GoodsNumber)))
+		}
+		var total = decimal.NewFromInt(0)
+		if user.VipLevel > 0 {
+			total = totalVip
+		} else {
+			total = totalOri
+		}
+		fmt.Printf("total = %s;totalVip = %s;totalOri = %s", total, totalVip, totalOri)
 
 		if wxResp, err := wxPayClient.V3TransactionJsapi(ginCtx, gopay.BodyMap{
 			"mchid":        wxPayConfig.MchId,
@@ -118,10 +122,17 @@ func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*prot
 				OrderType:   3,
 				Status:      enum.PayLogStatusUnPaid,
 			}
-			if err = tx.Create(payLog).Error; err != nil {
+			if err := tx.Create(payLog).Error; err != nil {
 				return err
 			}
-
+			//更细pindanRecord实付款
+			if err := tx.Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanRecord.Id}}).Updates(map[string]interface{}{
+				"amount":      totalVip,
+				"amount_real": totalVip,
+				"is_vip":      user.VipLevel > 0,
+			}).Error; err != nil {
+				return err
+			}
 			return nil
 		}); err != nil {
 			return nil, errors.Wrap(err, "微信下单失败")
@@ -177,7 +188,7 @@ func (s *pindanSrv) JoinPindan(c context.Context, ip string, reqVo *proto.Create
 
 	var pindanRecord model.PinDanRecord
 	var user model.BeeUser
-	// var shopInfo model.BeeShopInfo
+	var shopInfo model.BeeShopInfo
 	var goods model.BeeShopGoods
 
 	// 查询用户信息
@@ -187,6 +198,8 @@ func (s *pindanSrv) JoinPindan(c context.Context, ip string, reqVo *proto.Create
 		return 0, errors.New("拼单信息不存在")
 	} else if err := db.GetDB().Where("id = ? and is_deleted = 0", reqVo.GoodsId).First(&goods).Error; err != nil {
 		return 0, errors.New("商品信息不存在")
+	} else if err := db.GetDB().Where("id = ? and is_deleted = 0", pindanRecord.ShopId).First(&shopInfo).Error; err != nil {
+		return 0, errors.New("门店信息不存在")
 	} else {
 		// 校验商品属性
 		var goodsProps []model.BeeShopGoodsProp
@@ -249,7 +262,7 @@ func (s *pindanSrv) JoinPindan(c context.Context, ip string, reqVo *proto.Create
 				OrderType:        enum.OrderTypePindan,
 				ShopId:           goods.ShopId,
 				ShopIdZt:         goods.ShopId,
-				ShopNameZt:       goods.Name,
+				ShopNameZt:       shopInfo.Name,
 				Status:           enum.OrderStatusUnPaid,
 				PeisongType:      int8(enum.OrderPeisongTypeZiti),
 				PindanId:         pindanRecord.Id,
@@ -314,18 +327,21 @@ func (s *pindanSrv) CreatePindan(c context.Context, ip string, reqVo *proto.Crea
 		}
 		var propertyTx = db.GetDB().Where("is_deleted = 0")
 
-		propertyTx.Scopes(func(db *gorm.DB) *gorm.DB {
-			for _, sku := range reqVo.Sku {
-				db.Or("id = ? and property_id = ?", sku.OptionValueId, sku.OptionId)
-			}
-			return db
-		})
+		var subQueryDb = db.GetDB()
+		for _, sku := range reqVo.Sku {
+			subQueryDb = subQueryDb.Or("id = ? and property_id = ?", sku.OptionValueId, sku.OptionId)
+		}
+		propertyTx.Where(subQueryDb)
 		if err := propertyTx.Find(&goodsProps).Error; err != nil {
 			return 0, errors.New("商品属性信息不存在")
 		}
 		// property_child_ids = strings.TrimRight(property_child_ids, ",")
 		logger.GetLogger().Debug("property_child_ids:", zap.String("property_child_ids", property_child_ids))
-		if err := db.GetDB().Where("goods_id = ? and is_deleted = 0 and property_child_ids = ?", reqVo.GoodsId, property_child_ids).First(&skuSelected).Error; err != nil {
+		tx := db.GetDB().Where("goods_id = ? and is_deleted = 0", reqVo.GoodsId)
+		for _, v := range strings.Split(property_child_ids, ",") {
+			tx.Where("property_child_ids like ?", "%"+v+"%")
+		}
+		if err := tx.First(&skuSelected).Error; err != nil {
 			return 0, errors.New("商品规格信息不存在")
 		}
 
@@ -378,7 +394,7 @@ func (s *pindanSrv) CreatePindan(c context.Context, ip string, reqVo *proto.Crea
 				OrderType:        enum.OrderTypePindan,
 				ShopId:           goods.ShopId,
 				ShopIdZt:         goods.ShopId,
-				ShopNameZt:       goods.Name,
+				ShopNameZt:       shopInfo.Name,
 				Status:           enum.OrderStatusUnPaid,
 				PeisongType:      int8(enum.OrderPeisongTypeZiti),
 				PindanId:         pindanRecord.Id,
@@ -619,19 +635,46 @@ func (s pindanSrv) GetMyJoinedPindanRecord(page int64, status int64, uid int64) 
 	var result []proto.MyJoinedPindanItem
 	var tx = db.GetDB().Model(&model.BeePindanOrderItem{}).Where("bee_pindan_order_item.user_id = ?", uid)
 
-	tx.Select("bee_pindan_order_item.*")
-	tx.Joins("left join bee_shop_info a on a.id = bee_pindan_order_item.shop_id  ").
-		Select("a.id as shopinfo_id,a.name as shopinfo_name").
-		Joins("left join bee_shop_goods b on b.id = bee_pindan_order_item.goods_id").Select("b.id as goodsinfo_id,b.name as goodsinfo_name,b.pic as goodsinfo_pic")
+	tx = tx.Joins("left join bee_shop_info a on a.id = bee_pindan_order_item.shop_id  ").
+		Joins("left join bee_shop_goods b on b.id = bee_pindan_order_item.goods_id").
+		Select("bee_pindan_order_item.*,a.id as shopinfo_id,a.name as shopinfo_name,b.id as goodsinfo_id,b.name as goodsinfo_name,b.pic as goodsinfo_pic")
 
 	if status > -1 {
-		tx.Where("bee_pindan_order_item.status = ?", status)
+		tx = tx.Where("bee_pindan_order_item.status = ?", status)
 	}
 	//分页
 	if page <= 0 {
 		page = 1
 	}
-	tx.Offset((int(page) - 1) * 10).Limit(10)
-	err := tx.Scan(&result).Error
+	err := tx.Offset((int(page) - 1) * 10).Limit(10).Scan(&result).Error
 	return result, err
+}
+
+// 取单
+func (s pindanSrv) Qudan(id int64, userId int64) error {
+
+	var pindanItem model.BeePindanOrderItem
+	if err := db.GetDB().Model(&model.BeePindanOrderItem{}).First(&pindanItem, id).Error; err != nil {
+		return &enum.BussError{Code: 10000, Message: "拼单不存在", Err: err}
+	} else if pindanItem.UserId != userId {
+		return &enum.BussError{Code: 100001, Message: "只能取自己的拼单"}
+	} else if pindanItem.Status != enum.OrderStatusPaid {
+		return &enum.BussError{Code: 100002, Message: "拼单状态不合法"}
+	} else {
+		db.GetDB().Model(&model.BeePindanOrderItem{BaseModel: common.BaseModel{Id: id}}).Updates(map[string]interface{}{
+			"status":     enum.OrderStatusQudan,
+			"qudan_time": time.Now(),
+		})
+
+		// 如果所有拼单项都已取单,更新拼单状态
+		var unQudanCount int64
+		if err := db.GetDB().Model(&model.BeePindanOrderItem{}).Where("status !=  ?", enum.OrderStatusQudan).Count(&unQudanCount).Error; err == nil {
+			if unQudanCount == 0 {
+				// 都已取单
+				db.GetDB().Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanItem.PindanId}}).Update("status", enum.OrderStatusQudan)
+			}
+		}
+
+		return nil
+	}
 }

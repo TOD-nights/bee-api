@@ -1016,7 +1016,7 @@ func (s *OrderSrv) PayOrderByBalance(c context.Context, ip string, payLog *model
 	return err
 }
 
-// 拼单订单 支付完成
+// 拼单订单 支付完成回调
 func (s *OrderSrv) PayPindanOrder(c context.Context, ip string, payLog *model.BeePayLog, orderId string, thirdId string, amount decimal.Decimal, extraTx ...func(tx *gorm.DB) error) error {
 
 	var pindanRecord model.PinDanRecord
@@ -1048,14 +1048,32 @@ func (s *OrderSrv) PayPindanOrder(c context.Context, ip string, payLog *model.Be
 			"date_update":    time.Now(),
 			"third_order_no": thirdId,
 		})
+
+		var pindanItems []model.BeePindanOrderItem
+		db.GetDB().Model(&model.BeePindanOrderItem{}).Where("pindan_id = ?", pindanRecord.Id).Find(&pindanItems)
+		var goodsNumber = 0
+		for _, item := range pindanItems {
+			goodsNumber += int(item.GoodsNumber)
+		}
 		// 更新拼单状态
 		tx.Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanRecord.Id}}).Updates(map[string]interface{}{
-			"status": 1, "is_pay": true,
+			"status": 1, "is_pay": true, "date_pay": time.Now(),
+			"goods_number": goodsNumber,
 		})
 		// 更新拼单项状态
 		tx.Model(&model.BeePindanOrderItem{PindanId: pindanRecord.Id}).Updates(map[string]interface{}{
-			"status": 1, "is_pay": true,
+			"status": 1, "is_pay": true, "date_pay": time.Now(),
 		})
+
+		// 生成取单号
+		for _, item := range pindanItems {
+			if seq, err := s.generateTakeoutNo(tx, pindanRecord.ShopId); err != nil {
+				logger.GetLogger().Sugar().Error(err)
+				continue
+			} else {
+				tx.Model(&model.BeePindanOrderItem{BaseModel: common.BaseModel{Id: item.Id}}).Update("qudanhao", seq)
+			}
+		}
 
 		if payLogUpdateRs.Error != nil {
 			return errors.Wrap(payLogUpdateRs.Error, "更新支付信息失败")
@@ -1066,6 +1084,22 @@ func (s *OrderSrv) PayPindanOrder(c context.Context, ip string, payLog *model.Be
 		return nil
 	})
 	return err
+}
+
+func (s *OrderSrv) generateTakeoutNo(db *gorm.DB, shopid int64) (string, error) {
+
+	datestr := time.Now().Format("20160102")
+	result := db.Exec("insert into takeout_order_no(shop_id,date_str,seq) value(?,?,1) on duplicate update seq = seq+1", shopid, datestr)
+
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	var currentSeq int
+	db.Raw("select seq from takeout_order_no where shop_id = ? and date_str = ?", shopid, datestr).Scan(&currentSeq)
+
+	return fmt.Sprintf("%04d", currentSeq), nil
+
 }
 func (s *OrderSrv) paySuccess(c context.Context, tx *gorm.DB, orderInfo *proto.OrderDto, userInfo *model.BeeUser, amountBalance decimal.Decimal, ip string) error {
 	var (

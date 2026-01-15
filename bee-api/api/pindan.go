@@ -116,6 +116,18 @@ func (api PindanApi) GetMyJoinedPindanRecord(ctx *gin.Context) {
 	}
 }
 
+// / 取单,
+func (api PindanApi) Qudan(ctx *gin.Context) {
+
+	if id, err := strconv.ParseInt(ctx.Query("id"), 10, 64); err != nil {
+		api.Res(ctx, nil, errors.New("请求参数不合法"))
+	} else if err := service.GetPinDanServ().Qudan(id, kit.GetUid(ctx)); err != nil {
+		api.Res(ctx, nil, &enum.BussError{Code: 100000, Message: err.Error(), Err: err})
+	} else {
+		api.Res(ctx, true, nil)
+	}
+}
+
 type orderQueryParam struct {
 	Page   int64 `json:"page" form:"page"`
 	Status int64 `json:"status" form:"status"`

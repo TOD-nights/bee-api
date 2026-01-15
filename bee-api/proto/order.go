@@ -426,18 +426,18 @@ type PindanItemGoods struct {
 }
 
 type PinDanUserInfo struct {
-	Id        int64  `json:"id" mapstructure:"id"`               // 用户ID
-	Nick      string `json:"nick" mapstructure:"nick"`           // 昵称
-	AvatarUrl string `json:"avatarUrl" mapstructure:"avatarUrl"` // 头像
-	Mobile    string `json:"mobile" mapstructure:"mobile"`       // 手机号码
+	Id        int64  `gorm:"column:id;" json:"id" mapstructure:"id"`                       // 用户ID
+	Nick      string `gorm:"column:nick;" json:"nick" mapstructure:"nick"`                 // 昵称
+	AvatarUrl string `gorm:"column:avatar_url;" json:"avatarUrl" mapstructure:"avatarUrl"` // 头像
+	Mobile    string `gorm:"column:mobile;" json:"mobile" mapstructure:"mobile"`           // 手机号码
 }
 
 // / 拼单店铺信息
 type PindanShopInfo struct {
-	Id        int64   `json:"id" mapstructure:"id"`               // 店铺ID
-	Address   string  `json:"address" mapstructure:"address"`     // 店铺地址
-	Name      string  `json:"name" mapstructure:"name"`           // 店铺名称
-	LinkPhone string  `json:"linkPhone" mapstructure:"linkPhone"` // 店铺联系电话
-	Latitude  float64 `json:"latitude" mapstructure:"latitude"`   // 店铺纬度
-	Longitude float64 `json:"longitude" mapstructure:"longitude"` // 店铺经度
+	Id        int64   `gorm:"column:id;" json:"id" mapstructure:"id"`                       // 店铺ID
+	Address   string  `gorm:"column:address;" json:"address" mapstructure:"address"`        // 店铺地址
+	Name      string  `gorm:"column:name;" json:"name" mapstructure:"name"`                 // 店铺名称
+	LinkPhone string  `gorm:"column:link_phone;" json:"linkPhone" mapstructure:"linkPhone"` // 店铺联系电话
+	Latitude  float64 `gorm:"column:latitude;" json:"latitude" mapstructure:"latitude"`     // 店铺纬度
+	Longitude float64 `gorm:"column:longitude;" json:"longitude" mapstructure:"longitude"`  // 店铺经度
 }

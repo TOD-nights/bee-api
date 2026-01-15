@@ -1,6 +1,8 @@
 package proto
 
 import (
+	"database/sql"
+
 	"gitee.com/stuinfer/bee-api/common"
 	"gitee.com/stuinfer/bee-api/enum"
 	"github.com/shopspring/decimal"
@@ -35,6 +37,7 @@ type MyJoinedPindanItem struct {
 	GoodsPropertyIds   string           `gorm:"column:goods_property_ids;type:varchar(255);comment:商品属性ids组合" json:"goodsPropertyIds"`
 	GoodsPropertyNames string           `gorm:"column:goods_property_names;type:varchar(255);comment:商品属性名称" json:"goodsPropertyNames"`
 	GoodsId            int64            `gorm:"column:goods_id;type:bigint(20);comment:商品id" json:"goodsId"`
-	ShopInfo           PindanShopInfo   `gorm:"embedded;prefix:shopinfo_;" json:"shopInfo"`
-	GoodsInfo          PindanItemGoods  `gorm:"embedded;prefix:goodsinfo_;" json:"goodsInfo"`
+	ShopInfo           PindanShopInfo   `gorm:"embedded;embeddedPrefix:shopinfo_;" json:"shopInfo"`
+	GoodsInfo          PindanItemGoods  `gorm:"embedded;embeddedPrefix:goodsinfo_;" json:"goodsInfo"`
+	QudanTime          sql.NullTime     `gorm:"column:qudan_time;datetime;comment:取单时间" json:"qudanTime"`
 }

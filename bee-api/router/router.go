@@ -277,6 +277,7 @@ func NewRouter() *gin.Engine {
 		orderGroup.GET("/getMyCreatedPindanRecord", (api.PindanApi{}).GetMyCreatedPindanRecord)            // 我发起的拼单查询
 		orderGroup.GET("/getMyJoinedPindanRecord", (api.PindanApi{}).GetMyJoinedPindanRecord)              // 我发起的拼单查询
 		orderGroup.POST("/pindan/buy/wxpay", (api.PindanApi{}).PindanWxPay)                                // 微信支付拼单订单
+		orderGroup.POST("/pindan/qudan", (api.PindanApi{}).Qudan)                                          // 微信支付拼单订单
 	}
 	scoreGroup := domainGroup.Group("/score", CheckToken())
 	{

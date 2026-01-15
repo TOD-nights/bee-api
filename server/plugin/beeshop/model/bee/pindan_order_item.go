@@ -1,4 +1,4 @@
-package model
+package bee
 
 import (
 	"database/sql"

@@ -556,6 +556,7 @@ func (*BeeShopPlugin) Register(group *gin.RouterGroup) {
 	router.InitMemberCardRoute(privateGroup, publicGroup)
 	router.InitUserMemberCardRoute(privateGroup, publicGroup)
 	router.InitUserMemberCardUsedLogRoute(privateGroup, publicGroup)
+	router.InitPindanRoute(privateGroup, publicGroup)
 }
 
 func (*BeeShopPlugin) RouterPath() string {

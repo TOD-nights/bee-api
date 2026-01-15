@@ -16,3 +16,9 @@
 .idea
 .idea/dataSources.xml
 .workflow
+tmp/
+*.iml
+*.log
+.vscode/
+.DS_Store   
+server/tmp/
