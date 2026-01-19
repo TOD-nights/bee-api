@@ -226,6 +226,7 @@ func NewRouter() *gin.Engine {
 		userGroup.GET("/my", (api.UserApi{}).My)
 		userGroup.POST("/level/list", (api.UserApi{}).LevelList)
 		userGroup.GET("/detail", (api.UserApi{}).Detail)
+		userGroup.GET("/vipLevel/:id", (api.UserApi{}).VipLevelById)
 		userGroup.POST("/modify", (api.UserApi{}).Modify)
 		userGroup.GET("/amount", (api.UserApi{}).Amount)
 		userGroup.GET("/check-token", (api.UserApi{}).CheckToken)

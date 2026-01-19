@@ -96,10 +96,12 @@ func (api PindanApi) GetMyCreatedPindanRecord(ctx *gin.Context) {
 func (api PindanApi) PindanWxPay(ctx *gin.Context) {
 
 	pindanId, _ := strconv.ParseInt(ctx.PostForm("pindanId"), 10, 64)
-	if res, err := service.GetPinDanServ().WxPay(ctx, pindanId, kit.GetUid(ctx)); err != nil {
-		fmt.Println(err)
+	if res, payOrderId, err := service.GetPinDanServ().WxPay(ctx, pindanId, kit.GetUid(ctx)); err != nil {
 		api.Fail(ctx, enum.ResCodeFail, "微信支付失败")
+	} else if res == nil {
+		api.Success(ctx, map[string]interface{}{"message": "余额支付完成", "is_pay": true, "payOrderId": payOrderId})
 	} else {
+		fmt.Println("res:", res)
 		api.Success(ctx, res)
 	}
 }

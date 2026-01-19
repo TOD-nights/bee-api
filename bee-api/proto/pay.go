@@ -3,15 +3,16 @@ package proto
 import "github.com/shopspring/decimal"
 
 type GetWxPayInfoRes struct {
-	TimeStamp  string `json:"timeStamp"`
-	OutTradeId string `json:"outTradeId"`
-	Package    string `json:"package"`
-	PaySign    string `json:"paySign"`
-	Appid      string `json:"appid"`
-	Sign       string `json:"sign"`
-	SignType   string `json:"signType"`
-	PrepayId   string `json:"prepayId"`
-	NonceStr   string `json:"nonceStr"`
+	TimeStamp  string          `json:"timeStamp"`
+	OutTradeId string          `json:"outTradeId"`
+	Package    string          `json:"package"`
+	PaySign    string          `json:"paySign"`
+	Appid      string          `json:"appid"`
+	Sign       string          `json:"sign"`
+	SignType   string          `json:"signType"`
+	PrepayId   string          `json:"prepayId"`
+	NonceStr   string          `json:"nonceStr"`
+	PayAmount  decimal.Decimal `json:"payAmount"`
 }
 
 type PayBillRes struct {

@@ -2,6 +2,9 @@ package api
 
 import (
 	"errors"
+	"net/http"
+
+	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/model"
 	"gitee.com/stuinfer/bee-api/proto"
@@ -9,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type BaseApi struct {
@@ -18,6 +20,15 @@ type BaseApi struct {
 func (api BaseApi) GetUserInfo(c *gin.Context) *model.BeeUser {
 	data, _ := c.Get(enum.UserInfoKey)
 	return data.(*model.BeeUser)
+}
+func (api BaseApi) GetUserInfoById(c *gin.Context) *model.BeeUser {
+	// data, _ := c.Get(enum.UserInfoKey)
+	if id, flag := c.Params.Get("id"); flag {
+		var user model.BeeUser
+		db.GetDB().First(&user, id)
+		return &user
+	}
+	return nil
 }
 
 func (api BaseApi) Success(c *gin.Context, data interface{}) {

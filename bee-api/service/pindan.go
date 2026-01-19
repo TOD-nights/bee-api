@@ -41,7 +41,7 @@ func GetPinDanServ() *pindanSrv {
 	return pindanSrvInstance
 }
 
-func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*proto.GetWxPayInfoRes, error) {
+func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*proto.GetWxPayInfoRes, string, error) {
 
 	var pindanRecord model.PinDanRecord
 	var pindanRecordItems []model.BeePindanOrderItem
@@ -54,25 +54,27 @@ func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*prot
 	var payOrderId = util.GetRandInt64()
 	if err := db.GetDB().Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanId}}).First(&pindanRecord).Error; err != nil {
 		logger.GetLogger().Error(err.Error())
-		return nil, err
+		return nil, payOrderId, err
+	} else if user, err := GetUserSrv().GetUser(ginCtx); err != nil {
+		return nil, payOrderId, errors.Wrap(err, "获取用户信息失败")
+	} else if userAmount, err := GetUserSrv().Amount(ginCtx, user.Id); err != nil {
+		return nil, payOrderId, errors.Wrap(err, "获取用户账户信息失败")
 	} else if err := db.GetDB().Model(&model.BeePindanOrderItem{}).Where("pindan_id = ?", pindanId).Find(&pindanRecordItems).Error; err != nil {
-		return nil, enum.NewBussErr(err, enum.ResCodeFail, "拼单项查询失败")
+		return nil, payOrderId, enum.NewBussErr(err, enum.ResCodeFail, "拼单项查询失败")
 	} else if err := db.GetDB().Where("user_id = ? and is_deleted = 0", kit.GetUserId(ginCtx)).Take(&wxPayConfig).Error; err != nil {
-		return nil, errors.Wrap(err, "获取微信配置失败！")
+		return nil, payOrderId, errors.Wrap(err, "获取微信配置失败！")
 	} else if wxPayClient, err := GetPaySrv().GetWechatPayClient(ginCtx, &WxPayConfig{
 		MchId:           wxPayConfig.MchId,
 		Secret:          wxPayConfig.AppSecret,
 		Token:           wxPayConfig.Token,
 		ReturnUrl:       "",
 		NotifyUrl:       GetPaySrv().GetWxPayNotifyUrl(ginCtx, &wxPayConfig),
-		PrivateCertPath: "/Users/mac/project/bee-api/bee-api/lingwu_key.pem", //wxPayConfig.PrivateCert,
+		PrivateCertPath: wxPayConfig.PrivateCert, //"/Users/mac/project/bee-api/bee-api/lingwu_key.pem", //wxPayConfig.PrivateCert,
 		Debug:           wxPayConfig.Debug,
 	}); err != nil {
-		return nil, errors.Wrap(err, "获取微信支付客户端失败！")
+		return nil, payOrderId, errors.Wrap(err, "获取微信支付客户端失败！")
 	} else if userOpenId, err := GetUserSrv().GetUserWxOpenId(ginCtx); err != nil {
-		return nil, err
-	} else if user, err := GetUserSrv().GetUser(ginCtx); err != nil {
-		return nil, errors.Wrap(err, "获取用户信息失败")
+		return nil, payOrderId, err
 	} else {
 
 		var totalOri = decimal.NewFromInt(0)
@@ -88,70 +90,120 @@ func (s *pindanSrv) WxPay(ginCtx *gin.Context, pindanId int64, uid int64) (*prot
 		} else {
 			total = totalOri
 		}
-		fmt.Printf("total = %s;totalVip = %s;totalOri = %s", total, totalVip, totalOri)
 
-		if wxResp, err := wxPayClient.V3TransactionJsapi(ginCtx, gopay.BodyMap{
-			"mchid":        wxPayConfig.MchId,
-			"out_trade_no": payOrderId,
-			"appid":        wxPayConfig.AppId,
-			"description":  "拼单支付",
-			"notify_url":   GetPaySrv().GetWxPayNotifyUrl(ginCtx, &wxPayConfig),
-			"amount": map[string]interface{}{
-				"total":    total.Mul(decimal.NewFromInt(100)).IntPart(),
-				"currency": "CNY",
-			},
-			"time_expire": time.Now().Add(time.Hour * 1).Format(time.RFC3339), // 限制一小时内支付
-			"payer": map[string]interface{}{
-				"openid": userOpenId,
-			},
-		}); err != nil {
-			return nil, err
-		} else if wxResp.Code != 0 {
-			return nil, errors.New("微信请求失败：" + wxResp.Error)
-		} else if err := db.GetDB().Transaction(func(tx *gorm.DB) error {
-			payLog := &model.BeePayLog{
-				BaseModel:   *kit.GetInsertBaseModel(ginCtx),
-				Money:       total.Mul(decimal.NewFromInt(100)),
-				NextAction:  fmt.Sprintf("{type: 16,id:%s}", payOrderId),
-				OrderNo:     payOrderId,
-				OrderNumber: strconv.FormatInt(int64(pindanId), 10),
-				PayGate:     enum.PayGateWXAPP,
-				Remark:      "拼单支付",
-				Uid:         kit.GetUid(ginCtx),
-				ShopId:      pindanRecord.ShopId,
-				OrderType:   3,
-				Status:      enum.PayLogStatusUnPaid,
+		if userAmount.Balance.GreaterThan(total) {
+			//全部使用余额支付
+
+			db.GetDB().Model(&model.BeeUserAmount{
+				BaseModel: common.BaseModel{Id: userAmount.Id},
+			}).Update("balance", gorm.Expr("balance - ?", total))
+			total = decimal.NewFromInt(0)
+			if err := db.GetDB().Transaction(func(tx *gorm.DB) error {
+				payLog := &model.BeePayLog{
+					BaseModel:   *kit.GetInsertBaseModel(ginCtx),
+					Money:       total.Mul(decimal.NewFromInt(100)),
+					NextAction:  fmt.Sprintf("{type: 16,id:%s}", payOrderId),
+					OrderNo:     payOrderId,
+					OrderNumber: strconv.FormatInt(int64(pindanId), 10),
+					PayGate:     enum.PayGateWXAPP,
+					Remark:      "拼单支付",
+					Uid:         kit.GetUid(ginCtx),
+					ShopId:      pindanRecord.ShopId,
+					OrderType:   3,
+					Status:      enum.PayLogStatusUnPaid,
+				}
+				if err := tx.Create(payLog).Error; err != nil {
+					return err
+				}
+				//更新pindanRecord实付款
+
+				if err := tx.Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanRecord.Id}}).Updates(map[string]interface{}{
+					"amount":      totalVip,
+					"amount_real": total,
+					"is_vip":      user.VipLevel > 0,
+					"is_pay":      true,
+				}).Error; err != nil {
+					return err
+				}
+				return nil
+			}); err != nil {
+				return nil, payOrderId, errors.Wrap(err, "微信下单失败")
+			} else {
+				return nil, payOrderId, nil
 			}
-			if err := tx.Create(payLog).Error; err != nil {
-				return err
-			}
-			//更细pindanRecord实付款
-			if err := tx.Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanRecord.Id}}).Updates(map[string]interface{}{
-				"amount":      totalVip,
-				"amount_real": totalVip,
-				"is_vip":      user.VipLevel > 0,
-			}).Error; err != nil {
-				return err
-			}
-			return nil
-		}); err != nil {
-			return nil, errors.Wrap(err, "微信下单失败")
-		} else if jsapiSignInfo, err := wxPayClient.PaySignOfApplet(wxPayConfig.AppId, wxResp.Response.PrepayId); err != nil {
-			return nil, errors.Wrap(err, "获取微信支付签名失败")
 		} else {
+			// 部分使用支付
+			total = total.Sub(userAmount.Balance)
+			if wxResp, err := wxPayClient.V3TransactionJsapi(ginCtx, gopay.BodyMap{
+				"mchid":        wxPayConfig.MchId,
+				"out_trade_no": payOrderId,
+				"appid":        wxPayConfig.AppId,
+				"description":  "拼单支付",
+				"notify_url":   GetPaySrv().GetWxPayNotifyUrl(ginCtx, &wxPayConfig),
+				"amount": map[string]interface{}{
+					"total":    total.Mul(decimal.NewFromInt(100)).IntPart(),
+					"currency": "CNY",
+				},
+				"time_expire": time.Now().Add(time.Hour * 1).Format(time.RFC3339), // 限制一小时内支付
+				"payer": map[string]interface{}{
+					"openid": userOpenId,
+				},
+			}); err != nil {
+				return nil, payOrderId, err
+			} else if wxResp.Code != 0 {
+				return nil, payOrderId, errors.New("微信请求失败：" + wxResp.Error)
+			} else if err := db.GetDB().Model(&model.BeeUserAmount{
+				BaseModel: common.BaseModel{Id: userAmount.Id},
+			}).Update("balance", 0).Error; err != nil {
+				return nil, payOrderId, errors.Wrap(err, "更新用户余额失败")
+			} else if jsapiSignInfo, err := wxPayClient.PaySignOfApplet(wxPayConfig.AppId, wxResp.Response.PrepayId); err != nil {
+				return nil, payOrderId, errors.Wrap(err, "获取微信支付签名失败")
+			} else if err := db.GetDB().Transaction(func(tx *gorm.DB) error {
+				payLog := &model.BeePayLog{
+					BaseModel:   *kit.GetInsertBaseModel(ginCtx),
+					Money:       total.Mul(decimal.NewFromInt(100)),
+					NextAction:  fmt.Sprintf("{type: 16,id:%s}", payOrderId),
+					OrderNo:     payOrderId,
+					OrderNumber: strconv.FormatInt(int64(pindanId), 10),
+					PayGate:     enum.PayGateWXAPP,
+					Remark:      "拼单支付",
+					Uid:         kit.GetUid(ginCtx),
+					ShopId:      pindanRecord.ShopId,
+					OrderType:   3,
+					Status:      enum.PayLogStatusUnPaid,
+				}
+				if err := tx.Create(payLog).Error; err != nil {
+					return err
+				}
+				//更新pindanRecord实付款
+				if err := tx.Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanRecord.Id}}).Updates(map[string]interface{}{
+					"amount":      totalVip,
+					"amount_real": total,
+					"is_vip":      user.VipLevel > 0,
+					"is_pay":      false,
+				}).Error; err != nil {
+					return err
+				}
+				return nil
+			}); err != nil {
+				return nil, payOrderId, errors.Wrap(err, "微信下单失败")
+			} else {
 
-			return &proto.GetWxPayInfoRes{
-				TimeStamp:  jsapiSignInfo.TimeStamp,
-				OutTradeId: payOrderId,
-				Package:    jsapiSignInfo.Package,
-				PaySign:    jsapiSignInfo.PaySign,
-				Appid:      wxPayConfig.AppId,
-				Sign:       jsapiSignInfo.PaySign,
-				SignType:   jsapiSignInfo.SignType,
-				PrepayId:   payOrderId,
-				NonceStr:   jsapiSignInfo.NonceStr,
-			}, nil
+				return &proto.GetWxPayInfoRes{
+					TimeStamp:  jsapiSignInfo.TimeStamp,
+					OutTradeId: payOrderId,
+					Package:    jsapiSignInfo.Package,
+					PaySign:    jsapiSignInfo.PaySign,
+					Appid:      wxPayConfig.AppId,
+					Sign:       jsapiSignInfo.PaySign,
+					SignType:   jsapiSignInfo.SignType,
+					PrepayId:   payOrderId,
+					PayAmount:  total,
+					NonceStr:   jsapiSignInfo.NonceStr,
+				}, payOrderId, nil
+			}
 		}
+
 	}
 }
 

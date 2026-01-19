@@ -50,7 +50,20 @@ func (api UserApi) Modify(c *gin.Context) {
 
 func (api UserApi) Detail(c *gin.Context) {
 	userInfo := api.GetUserInfo(c)
-	api.Success(c, &proto.GetUserDetailResp{Base: userInfo})
+	var resp = proto.GetUserDetailResp{Base: userInfo}
+	if userAmount, err := service.GetUserSrv().Amount(c, userInfo.Id); err == nil {
+		resp.Balance = userAmount.BeeUserAmount.Balance
+	}
+	api.Success(c, &resp)
+}
+
+func (api UserApi) VipLevelById(c *gin.Context) {
+	userInfo := api.GetUserInfoById(c)
+	if userInfo == nil {
+		api.Fail(c, 400, "用户不存在")
+		return
+	}
+	api.Success(c, userInfo.VipLevel)
 }
 
 func (api UserApi) CashLog(c *gin.Context) {
