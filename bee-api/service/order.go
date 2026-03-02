@@ -963,10 +963,12 @@ func (s *OrderSrv) PayOrderByBalance(c context.Context, ip string, payLog *model
 		return errors.Wrap(err, "获取用户余额失败")
 	}
 
-	if !amount.Equal(orderInfo.AmountReal) && orderInfo.AmountReal.GreaterThan(userAmount.Balance.Add(amount)) {
+	logger.GetLogger().Error("回调结果", zap.Any("orderInfo", util.ToJsonWithoutErr(orderInfo, "")), zap.Any("userAmount", util.ToJsonWithoutErr(userAmount, "")), zap.Any("amount", util.ToJsonWithoutErr(amount, "")))
+	if orderInfo.AmountReal.GreaterThan(userAmount.Balance.Add(amount)) {
 		return fmt.Errorf("金额不正确，应该为：%v 实际为：%v", orderInfo.AmountReal, userAmount.Balance.Add(amount))
 	}
 	amountBalance := orderInfo.AmountReal.Sub(amount)
+	logger.GetLogger().Error("回调结果", zap.Any("amountBalance", util.ToJsonWithoutErr(amountBalance, "")))
 	// 更新支付状态
 
 	err = db.GetDB().Transaction(func(tx *gorm.DB) error {

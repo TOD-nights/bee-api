@@ -148,6 +148,7 @@ func (fee *PaySrv) dealPayNotify(c context.Context, ip string, payResult *wechat
 		payType = enum.PayNextActionTypeRecharge
 	}
 
+	logger.GetLogger().Error("处理支付结果", zap.Any("payType", payType), zap.Any("nextActionJson", nextActionJson), zap.Any("payLog", util.ToJsonWithoutErr(payLog, "")))
 	switch payType {
 	case enum.PayNextActionTypeRecharge:
 		// 计算充值优惠
