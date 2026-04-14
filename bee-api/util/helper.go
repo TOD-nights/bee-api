@@ -3,8 +3,11 @@ package util
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
+	"math/rand"
 	"net"
 	"reflect"
+	"time"
 )
 
 func ReGroup[T1 any, T2 comparable](list []T1, fn func(a T1) T2) map[T2][]T1 {
@@ -47,4 +50,17 @@ func GetFreePort() (int, error) {
 	// 获取监听的端口
 	addr := listener.Addr().(*net.TCPAddr)
 	return addr.Port, nil
+}
+
+// / 生成随机订单号
+func GenerateOrderNo(prefix string, uid int64) string {
+	// 获取当前时间戳，格式化为字符串
+	timestamp := time.Now().Format("20060102150405")
+
+	// 生成随机数
+	randomNum := rand.Intn(9000) + 1000 // 生成1000到9999之间的随机数
+
+	// 拼接订单号
+	orderNo := fmt.Sprintf("%s%s%d%d", prefix, timestamp, uid%10000, randomNum)
+	return orderNo
 }

@@ -4,6 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"sync"
+	"text/template"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/common"
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
@@ -15,9 +19,6 @@ import (
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
-	"sync"
-	"text/template"
-	"time"
 )
 
 type PrinterSrv struct {

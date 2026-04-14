@@ -28,4 +28,5 @@ const (
 	PayNextActionTypePayOrder   PayNextActionType = 0  // 支付订单， { type: 0, id: orderId}
 	PayNextActionTypePayDirect  PayNextActionType = 4  // 优惠买单 {type: 4, uid: wx.getStorageSync('uid'), money: data.money}
 	PayNextActionTypeMemberCard PayNextActionType = 8  // 购买会员卡 {type: 8, uid: wx.getStorageSync('uid'), money: data.money}
+	PayNextActionTypePindan     PayNextActionType = 16 // 拼单 {type: 16, uid: wx.getStorageSync('uid'), money: data.money}
 )

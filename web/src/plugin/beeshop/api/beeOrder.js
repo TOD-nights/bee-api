@@ -170,7 +170,7 @@ export const findBeeOrder = (params) => {
 // @Router /beeOrder/getBeeOrderList [get]
 export const getBeeOrderList = (params) => {
   return service({
-    url: '/bee-shop/beeOrder/getBeeOrderList',
+    url: '/bee-shop/pindan/page',
     method: 'get',
     params
   })

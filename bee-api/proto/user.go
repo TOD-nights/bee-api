@@ -3,10 +3,12 @@ package proto
 import (
 	"gitee.com/stuinfer/bee-api/enum"
 	"gitee.com/stuinfer/bee-api/model"
+	"github.com/shopspring/decimal"
 )
 
 type GetUserDetailResp struct {
-	Base *model.BeeUser `json:"base"`
+	Base    *model.BeeUser  `json:"base"`
+	Balance decimal.Decimal `json:"balance"` //用户余额
 }
 
 type GetUserAmountResp struct {

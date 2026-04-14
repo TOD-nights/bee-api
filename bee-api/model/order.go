@@ -3,11 +3,12 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"gitee.com/stuinfer/bee-api/common"
 	"gitee.com/stuinfer/bee-api/enum"
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 // 订单
@@ -55,6 +56,7 @@ type BeeOrder struct {
 	Uid               int64                  `gorm:"column:uid;type:bigint(11);comment:用户id" json:"uid"`
 	ExtJsonStr        string                 `gorm:"column:ext_json_str;type:varchar(1000);comment:扩展信息" json:"extJsonStr"`
 	PeisongType       string                 `gorm:"column:peisong_type;type:varchar(30);comment:配送类型" json:"peisongType"`
+	PindanId          int64                  `gorm:"column:pindan_id;type:bigint(20);comment:拼单id" json:"pindanId"`
 }
 
 func (m *BeeOrder) TableName() string {

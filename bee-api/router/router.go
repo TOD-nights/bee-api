@@ -2,6 +2,10 @@ package router
 
 import (
 	_ "embed"
+	"net/http"
+	"os"
+	"strings"
+
 	"gitee.com/stuinfer/bee-api/api"
 	config2 "gitee.com/stuinfer/bee-api/config"
 	"gitee.com/stuinfer/bee-api/enum"
@@ -11,9 +15,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"net/http"
-	"os"
-	"strings"
 )
 
 var router = gin.New()
@@ -73,6 +74,9 @@ func CheckToken() gin.HandlerFunc {
 		token := c.Query("token")
 		if token == "" {
 			token = c.PostForm("token")
+		}
+		if token == "" {
+			token = c.GetHeader("x-token")
 		}
 
 		if token == "" {
@@ -150,6 +154,7 @@ func NewRouter() *gin.Engine {
 	{
 		{ // 门店
 			shopGroup.GET("/subshop/detail/v2", (api.ShopApi{}).SubShopDetail)
+			shopGroup.GET("/subshop/info", (api.ShopApi{}).GetShopInfo) // 门店详细
 			shopGroup.POST("/subshop/list", (api.ShopApi{}).SubShopList)
 		}
 		{ //商品
@@ -221,6 +226,7 @@ func NewRouter() *gin.Engine {
 		userGroup.GET("/my", (api.UserApi{}).My)
 		userGroup.POST("/level/list", (api.UserApi{}).LevelList)
 		userGroup.GET("/detail", (api.UserApi{}).Detail)
+		userGroup.GET("/vipLevel/:id", (api.UserApi{}).VipLevelById)
 		userGroup.POST("/modify", (api.UserApi{}).Modify)
 		userGroup.GET("/amount", (api.UserApi{}).Amount)
 		userGroup.GET("/check-token", (api.UserApi{}).CheckToken)
@@ -262,8 +268,17 @@ func NewRouter() *gin.Engine {
 		orderGroup.POST("/close", (api.OrderApi{}).Close)
 		orderGroup.POST("/delete", (api.OrderApi{}).Delete)
 		orderGroup.POST("/delivery", (api.OrderApi{}).Delivery)
-		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation) //评价
-		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                 //核销
+		orderGroup.POST("/reputation", (api.OrderApi{}).Reputation)                                        //评价
+		orderGroup.POST("/hx", (api.OrderApi{}).Hx)                                                        //核销
+		orderGroup.POST("/createPindan", (api.PindanApi{}).Create)                                         //发起拼单
+		orderGroup.POST("/joinPindan", (api.PindanApi{}).Join)                                             //发起拼单
+		orderGroup.GET("/getPinDanInfo", (api.PindanApi{}).GetPinDanInfo)                                  //查询拼单信息
+		orderGroup.GET("/getPinDanInfoById", (api.PindanApi{}).GetPinDanInfoById)                          //查询拼单信息
+		orderGroup.POST("/updatePindanPeisongTypeById/:id", (api.PindanApi{}).UpdatePindanPeisongTypeById) // 更新拼单配送方式
+		orderGroup.GET("/getMyCreatedPindanRecord", (api.PindanApi{}).GetMyCreatedPindanRecord)            // 我发起的拼单查询
+		orderGroup.GET("/getMyJoinedPindanRecord", (api.PindanApi{}).GetMyJoinedPindanRecord)              // 我发起的拼单查询
+		orderGroup.POST("/pindan/buy/wxpay", (api.PindanApi{}).PindanWxPay)                                // 微信支付拼单订单
+		orderGroup.POST("/pindan/qudan", (api.PindanApi{}).Qudan)                                          // 微信支付拼单订单
 	}
 	scoreGroup := domainGroup.Group("/score", CheckToken())
 	{

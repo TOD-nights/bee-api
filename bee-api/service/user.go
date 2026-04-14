@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/common"
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
@@ -14,8 +17,6 @@ import (
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
-	"sync"
-	"time"
 )
 
 type UserSrv struct {
@@ -388,4 +389,11 @@ func (srv *UserSrv) GetUserWxOpenId(c context.Context) (string, error) {
 		return "", err
 	}
 	return item.OpenId, nil
+}
+func (srv *UserSrv) GetUser(c context.Context) (model.BeeUser, error) {
+	item := model.BeeUser{}
+	if err := db.GetDB().Where("id = ?", kit.GetUid(c)).Take(&item).Error; err != nil {
+		return item, err
+	}
+	return item, nil
 }

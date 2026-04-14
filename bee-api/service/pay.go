@@ -4,6 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"gitee.com/stuinfer/bee-api/config"
 	"gitee.com/stuinfer/bee-api/db"
 	"gitee.com/stuinfer/bee-api/enum"
@@ -20,11 +26,6 @@ import (
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"io/ioutil"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 type PaySrv struct {
@@ -147,6 +148,7 @@ func (fee *PaySrv) dealPayNotify(c context.Context, ip string, payResult *wechat
 		payType = enum.PayNextActionTypeRecharge
 	}
 
+	logger.GetLogger().Error("处理支付结果", zap.Any("payType", payType), zap.Any("nextActionJson", nextActionJson), zap.Any("payLog", util.ToJsonWithoutErr(payLog, "")))
 	switch payType {
 	case enum.PayNextActionTypeRecharge:
 		// 计算充值优惠
@@ -202,6 +204,13 @@ func (fee *PaySrv) dealPayNotify(c context.Context, ip string, payResult *wechat
 			break
 		}
 		err = GetOrderSrv().PayOrderByBalance(c, ip, payLog, strconv.Itoa(id), payResult.TransactionId, payerTotal)
+	case enum.PayNextActionTypePindan:
+		var id, err = nextActionJson.Get("id").Int()
+		if err != nil {
+			return errors.Wrap(err, "订单id不合法")
+			break
+		}
+		err = GetOrderSrv().PayPindanOrder(c, ip, payLog, strconv.Itoa(id), payResult.TransactionId, payerTotal)
 	case enum.PayNextActionTypePayDirect:
 		moneyTotal, err := nextActionJson.Get("money").Float64()
 		if err != nil {

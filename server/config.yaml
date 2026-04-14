@@ -59,9 +59,9 @@ db-list:
       prefix: bee_
       port: "3306"
       config: charset=utf8mb4&parseTime=True&loc=Local
-      db-name: bee
+      db-name: dev
       username: root
-      password: PASS
+      password: Woshinibaba88!
       path: "47.98.186.186"
       engine: ""
       log-mode: info
@@ -129,9 +129,9 @@ mysql:
     prefix: ""
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
-    db-name: bee
+    db-name: dev
     username: root
-    password: PASS
+    password: Woshinibaba88!
     path: 47.98.186.186
     engine: ""
     log-mode: error

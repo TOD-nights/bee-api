@@ -963,10 +963,12 @@ func (s *OrderSrv) PayOrderByBalance(c context.Context, ip string, payLog *model
 		return errors.Wrap(err, "获取用户余额失败")
 	}
 
-	if !amount.Equal(orderInfo.AmountReal) && orderInfo.AmountReal.GreaterThan(userAmount.Balance.Add(amount)) {
+	logger.GetLogger().Error("回调结果", zap.Any("orderInfo", util.ToJsonWithoutErr(orderInfo, "")), zap.Any("userAmount", util.ToJsonWithoutErr(userAmount, "")), zap.Any("amount", util.ToJsonWithoutErr(amount, "")))
+	if orderInfo.AmountReal.GreaterThan(userAmount.Balance.Add(amount)) {
 		return fmt.Errorf("金额不正确，应该为：%v 实际为：%v", orderInfo.AmountReal, userAmount.Balance.Add(amount))
 	}
 	amountBalance := orderInfo.AmountReal.Sub(amount)
+	logger.GetLogger().Error("回调结果", zap.Any("amountBalance", util.ToJsonWithoutErr(amountBalance, "")))
 	// 更新支付状态
 
 	err = db.GetDB().Transaction(func(tx *gorm.DB) error {
@@ -1016,6 +1018,91 @@ func (s *OrderSrv) PayOrderByBalance(c context.Context, ip string, payLog *model
 	return err
 }
 
+// 拼单订单 支付完成回调
+func (s *OrderSrv) PayPindanOrder(c context.Context, ip string, payLog *model.BeePayLog, orderId string, thirdId string, amount decimal.Decimal, extraTx ...func(tx *gorm.DB) error) error {
+
+	var pindanRecord model.PinDanRecord
+	if err := db.GetDB().Where("id = ? and status = 0 and is_deleted = 0 and is_del_user = 0 and is_end = 0 and is_pay = 0",
+		payLog.OrderNumber).First(&pindanRecord).Error; err != nil {
+		return &enum.BussError{Code: 500001, Message: "拼单信息不存在"}
+	}
+
+	if pindanRecord.IsPay { //已支付了
+		return nil
+	}
+	if pindanRecord.IsDeleted || pindanRecord.IsDelUser {
+		return errors.New("订单已删除")
+	}
+	if pindanRecord.Status != enum.OrderStatusUnPaid {
+		return errors.New("不是未支付状态")
+	}
+
+	// userInfo, err := GetUserSrv().GetUserInfoByUid(c, pindanRecord.UserId)
+	// if err != nil {
+	// 	return errors.Wrap(err, "获取用户信息失败")
+	// }
+
+	var err = db.GetDB().Transaction(func(tx *gorm.DB) error {
+		// 扣除余额
+
+		payLogUpdateRs := db.GetDB().Model(&model.BeePayLog{}).Where("id = ?", payLog.Id).Updates(map[string]interface{}{
+			"status":         enum.PayLogStatusPaid,
+			"date_update":    time.Now(),
+			"third_order_no": thirdId,
+		})
+
+		var pindanItems []model.BeePindanOrderItem
+		db.GetDB().Model(&model.BeePindanOrderItem{}).Where("pindan_id = ?", pindanRecord.Id).Find(&pindanItems)
+		var goodsNumber = 0
+		for _, item := range pindanItems {
+			goodsNumber += int(item.GoodsNumber)
+		}
+		// 更新拼单状态
+		tx.Model(&model.PinDanRecord{BaseModel: common.BaseModel{Id: pindanRecord.Id}}).Updates(map[string]interface{}{
+			"status": 1, "is_pay": true, "date_pay": time.Now(),
+			"goods_number": goodsNumber,
+		})
+		// 更新拼单项状态
+		tx.Model(&model.BeePindanOrderItem{PindanId: pindanRecord.Id}).Updates(map[string]interface{}{
+			"status": 1, "is_pay": true, "date_pay": time.Now(),
+		})
+
+		// 生成取单号
+		for _, item := range pindanItems {
+			if seq, err := s.generateTakeoutNo(tx, pindanRecord.ShopId); err != nil {
+				logger.GetLogger().Sugar().Error(err)
+				continue
+			} else {
+				tx.Model(&model.BeePindanOrderItem{BaseModel: common.BaseModel{Id: item.Id}}).Update("qudanhao", seq)
+			}
+		}
+
+		if payLogUpdateRs.Error != nil {
+			return errors.Wrap(payLogUpdateRs.Error, "更新支付信息失败")
+		}
+		if payLogUpdateRs.RowsAffected != 1 {
+			return errors.New("更新冲突")
+		}
+		return nil
+	})
+	return err
+}
+
+func (s *OrderSrv) generateTakeoutNo(db *gorm.DB, shopid int64) (string, error) {
+
+	datestr := time.Now().Format("20160102")
+	result := db.Exec("insert into takeout_order_no(shop_id,date_str,seq) value(?,?,1) on duplicate update seq = seq+1", shopid, datestr)
+
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	var currentSeq int
+	db.Raw("select seq from takeout_order_no where shop_id = ? and date_str = ?", shopid, datestr).Scan(&currentSeq)
+
+	return fmt.Sprintf("%04d", currentSeq), nil
+
+}
 func (s *OrderSrv) paySuccess(c context.Context, tx *gorm.DB, orderInfo *proto.OrderDto, userInfo *model.BeeUser, amountBalance decimal.Decimal, ip string) error {
 	var (
 		err     error
